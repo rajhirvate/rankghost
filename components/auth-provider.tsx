@@ -19,6 +19,7 @@ import {
   useState,
 } from "react";
 import { getClientAuth, getClientDb } from "@/lib/firebase";
+import { getEffectivePlan } from "@/lib/pro-overrides";
 import { UserPlan } from "@/lib/types";
 
 type AuthContextValue = {
@@ -57,7 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (nextUser) {
         await ensureUserDoc(nextUser.uid);
         const userDoc = await getDoc(doc(db, "users", nextUser.uid));
-        setPlan((userDoc.data()?.plan ?? "free") as UserPlan["plan"]);
+        const basePlan = (userDoc.data()?.plan ?? "free") as UserPlan["plan"];
+        setPlan(getEffectivePlan(basePlan, nextUser.email));
       } else {
         setPlan("free");
       }

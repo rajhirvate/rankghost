@@ -1,87 +1,412 @@
-import { TopNav } from "@/components/top-nav";
+import { FaqAccordion } from "@/components/faq-accordion";
+import { LandingNav } from "@/components/landing-nav";
+import { TiltCard } from "@/components/tilt-card";
 import Link from "next/link";
+
+/* ─── data ─────────────────────────────────────────────────── */
+
+const everythingFeatures = [
+  { title: "Exact SERP Position", desc: "1-based rank across 100 Google results with root-domain matching.", icon: "🎯" },
+  { title: "AI Citation Status", desc: "See if ChatGPT & AI engines cite your domain for the keyword.", icon: "🤖" },
+  { title: "Rank History Charts", desc: "Sparklines show movement across your last 10 checks at a glance.", icon: "📈" },
+  { title: "Multi-Project Support", desc: "Manage multiple clients or sites from one account.", icon: "📁" },
+  { title: "Bulk Parallel Checks", desc: "Run all keywords simultaneously — no waiting in line.", icon: "🚀" },
+  { title: "Rank Change Delta", desc: "See exactly how many positions you gained or lost per check.", icon: "📉" },
+];
+
+const objections = [
+  { q: "Can't I just use Google Search Console?", a: "GSC is great for owned data but it's delayed by days and doesn't show exact live rankings across 100 results — or tell you if ChatGPT is citing your domain." },
+  { q: "Is the rank data actually live?", a: "Yes. Every check hits Apify's Google Search Scraper in real-time and returns fresh SERP data — not cached results." },
+  { q: "What if my site isn't in the top 100?", a: "We scan 10 pages × 10 results = 100 positions. If you're not found, we return 'Not found' so you know exactly where you stand." },
+  { q: "Do I need to know how to code?", a: "Not at all. RankGhost is a no-code dashboard. Create a project, add keywords, click Run Check." },
+  { q: "Is the free plan actually useful?", a: "Yes — 5 keywords, full SERP tracking, rank history charts. No credit card. It's a real product, not a teaser." },
+];
+
+/* ─── page ──────────────────────────────────────────────────── */
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <TopNav />
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-6 py-16">
-        <section className="space-y-6">
-          <p className="text-sm uppercase tracking-widest text-cyan-400">
-            SERP + AI Citation Monitoring
-          </p>
-          <h1 className="max-w-3xl text-4xl font-bold leading-tight md:text-6xl">
-            Track rankings and AI citations before your competitors do.
+    <div className="min-h-screen bg-white font-sans text-slate-200">
+      <LandingNav />
+
+      {/* ══ HERO ═════════════════════════════════════════════════ */}
+      <section className="relative flex flex-col items-center px-6 pt-28 pb-6 md:pt-36 bg-[#050505] rounded-b-[3rem]">
+        {/* Green radial gradient — centered in hero like the screenshot */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-[600px] w-[900px] rounded-full bg-[#39ff14]/25 blur-[140px]" />
+        </div>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-[300px] w-[400px] rounded-full bg-[#39ff14]/30 blur-[80px]" />
+        </div>
+
+        {/* Badge */}
+        <div className="relative z-10 mb-8 inline-flex items-center gap-2 rounded-full bg-[#111] px-5 py-2 border border-white/10">
+          <svg className="h-4 w-4 text-[#39ff14]" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+          </svg>
+          <span className="text-xs font-semibold text-slate-300">Latest feature just launched</span>
+        </div>
+
+        {/* Heading */}
+        <div className="relative z-10 mx-auto max-w-4xl text-center">
+          <h1 className="font-display font-normal leading-[1.1] tracking-tight">
+            <span className="block text-5xl text-white md:text-7xl lg:text-[6rem] whitespace-nowrap">Does AI</span>
+            <span className="block text-5xl md:text-7xl lg:text-[6rem] green-gradient-text whitespace-nowrap">know you exist?</span>
           </h1>
-          <p className="max-w-2xl text-lg text-slate-300">
-            RankGhost helps SEO teams monitor keyword position shifts and whether
-            AI engines mention your domain.
+
+          <p className="mx-auto mt-8 max-w-lg text-base leading-relaxed text-white md:text-lg">
+            Know where you rank. Know when AI cites you.
           </p>
-          <div className="flex gap-4">
+
+          <p className="mx-auto mt-2 max-w-lg text-sm text-white/60">
+            Your brand in Google. Your brand in AI. We track both.
+          </p>
+
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/signup"
-              className="rounded-lg bg-cyan-500 px-5 py-3 font-semibold text-slate-950 hover:bg-cyan-400"
+              className="font-display inline-block rounded-full bg-[#39ff14] px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_24px_rgba(57,255,20,0.4)] transition-all hover:scale-105 active:scale-95"
             >
-              Start Free
+              Start a Free Trial
             </Link>
             <Link
-              href="/dashboard"
-              className="rounded-lg border border-slate-700 px-5 py-3 font-semibold hover:border-slate-500"
+              href="/login"
+              className="font-display inline-block rounded-full border border-white/10 px-8 py-3.5 text-sm font-medium text-slate-300 transition-all hover:border-white/20 hover:text-white"
             >
-              View Dashboard
+              Sign in →
             </Link>
           </div>
-        </section>
+        </div>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {[
-            {
-              title: "Live SERP Checks",
-              body: "Run on-demand Google checks from your dashboard via Apify.",
-            },
-            {
-              title: "Rank Movement",
-              body: "See current rank and change vs. your previous check instantly.",
-            },
-            {
-              title: "AI Citation Layer",
-              body: "Unlock AI mention status in Pro to track emerging search channels.",
-            },
-          ].map((item) => (
-            <article
-              key={item.title}
-              className="rounded-xl border border-slate-800 bg-slate-900 p-6"
-            >
-              <h2 className="mb-2 text-xl font-semibold">{item.title}</h2>
-              <p className="text-slate-300">{item.body}</p>
-            </article>
-          ))}
-        </section>
+        {/* Dashboard mockup — sits below the CTA, bleeds to edge */}
+        <TiltCard className="relative z-10 mt-16 w-full max-w-6xl mx-auto">
+          {/* Fade out at bottom */}
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 z-20 bg-gradient-to-t from-[#050505] to-transparent" />
+          <div className="relative rounded-[24px] border border-white/10 bg-[#0e0e0e] overflow-hidden shadow-[0_-20px_80px_rgba(57,255,20,0.08)]">
+            {/* Top bar */}
+            <div className="flex items-center gap-4 border-b border-white/5 bg-[#0a0a0a] px-6 py-3">
+              {/* Logo area */}
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded bg-[#39ff14]/20 border border-[#39ff14]/30 flex items-center justify-center">
+                  <span className="text-[10px] font-black text-[#39ff14]">R</span>
+                </div>
+                <span className="text-xs font-bold text-white tracking-wide">RANKGHOST</span>
+              </div>
+              {/* Site selector */}
+              <div className="flex items-center gap-2 ml-6">
+                <span className="text-[10px] text-slate-500">Selected Site:</span>
+                <div className="flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-3 py-1">
+                  <span className="text-xs text-white font-medium">mysite.com</span>
+                  <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              {/* Add site button */}
+              <button className="ml-2 rounded-md bg-[#39ff14] px-3 py-1 text-[10px] font-bold text-black">+ Add new site</button>
+              {/* Search */}
+              <div className="ml-auto flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-4 py-1.5 w-48">
+                <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" d="m21 21-4.35-4.35"/></svg>
+                <span className="text-[10px] text-slate-500">Search</span>
+              </div>
+              {/* User */}
+              <div className="flex items-center gap-2 ml-4">
+                <div className="h-7 w-7 rounded-full bg-white/10 border border-white/20" />
+                <div>
+                  <div className="text-[10px] font-bold text-white leading-none">Raj H.</div>
+                  <div className="text-[9px] text-[#39ff14] leading-none mt-0.5">Pro Member</div>
+                </div>
+              </div>
+            </div>
 
-        <section className="space-y-6">
-          <h2 className="text-3xl font-bold">Pricing</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <article className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-              <h3 className="text-xl font-semibold">Free</h3>
-              <p className="mt-2 text-slate-300">For early-stage projects.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-200">
-                <li>Up to 5 keywords</li>
-                <li>1 check per keyword every 24h</li>
-                <li>AI citation status locked</li>
-              </ul>
-            </article>
-            <article className="rounded-xl border border-cyan-500 bg-slate-900 p-6">
-              <h3 className="text-xl font-semibold text-cyan-400">Pro</h3>
-              <p className="mt-2 text-slate-300">For agencies and growth teams.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-200">
-                <li>Up to 60 keywords</li>
-                <li>Daily checks</li>
-                <li>AI citation status unlocked</li>
-              </ul>
-            </article>
+            {/* Dashboard body */}
+            <div className="grid md:grid-cols-[180px_1fr] min-h-[420px]">
+              {/* Sidebar */}
+              <div className="hidden border-r border-white/5 md:flex flex-col gap-1 p-4">
+                {[
+                  { label: "Dashboard", active: true },
+                  { label: "Keywords", active: false },
+                  { label: "Projects", active: false },
+                  { label: "AI Citations", active: false },
+                  { label: "Settings", active: false },
+                ].map((item) => (
+                  <div key={item.label} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${item.active ? "bg-[#39ff14]/10 border border-[#39ff14]/20" : ""}`}>
+                    <div className={`h-3 w-3 rounded-sm ${item.active ? "bg-[#39ff14]" : "bg-white/10"}`} />
+                    <span className={`text-xs font-medium ${item.active ? "text-[#39ff14]" : "text-slate-500"}`}>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Main content */}
+              <div className="p-6">
+                {/* Stats row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  {[
+                    { label: "Unique Visitors", value: "34,521", trend: "+12%" },
+                    { label: "Avg. SERP Rank", value: "#14.3", trend: "↑ 3" },
+                    { label: "AI Citations", value: "8 / 20", trend: "cited" },
+                    { label: "SEO Health", value: "95%", trend: "↑" },
+                  ].map((stat) => (
+                    <div key={stat.label} className="rounded-xl border border-white/5 bg-[#111] p-4">
+                      <p className="text-[10px] text-slate-500 mb-1">{stat.label}</p>
+                      <p className="text-lg font-black text-white leading-none">{stat.value}</p>
+                      <p className="text-[10px] text-[#39ff14] mt-1">{stat.trend}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Keyword table */}
+                <div className="rounded-xl border border-white/5 bg-[#111] overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/5">
+                    <span className="text-xs font-bold text-white">Keyword Rankings</span>
+                    <span className="text-[10px] text-slate-500">Last checked: just now</span>
+                  </div>
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-white/5">
+                        {["Keyword", "SERP Rank", "Change", "AI Citation"].map(h => (
+                          <th key={h} className="px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { kw: "hostinger review", rank: "#4", change: "+2", ai: "cited" },
+                        { kw: "best web hosting 2024", rank: "#11", change: "-1", ai: "not_found" },
+                        { kw: "cheap vps hosting", rank: "#7", change: "+5", ai: "cited" },
+                        { kw: "wordpress hosting plans", rank: "#19", change: "–", ai: "not_found" },
+                      ].map((row) => (
+                        <tr key={row.kw} className="border-b border-white/[0.03]">
+                          <td className="px-5 py-3 text-xs text-white font-medium">{row.kw}</td>
+                          <td className="px-5 py-3 text-xs text-[#39ff14] font-bold">{row.rank}</td>
+                          <td className="px-5 py-3 text-xs text-slate-400">{row.change}</td>
+                          <td className="px-5 py-3">
+                            <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${row.ai === "cited" ? "bg-[#39ff14]/10 text-[#39ff14] border border-[#39ff14]/20" : "bg-white/5 text-slate-500 border border-white/5"}`}>
+                              {row.ai === "cited" ? "Cited" : "Not found"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
-      </main>
+        </TiltCard>
+      </section>
+
+      {/* ══ FEATURES BENTO ═════════════════════════════════════════ */}
+      <section id="features" className="pt-12 pb-32 relative bg-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
+             <div className="max-w-xl text-left">
+                <h2 className="font-display text-4xl font-normal text-slate-900 md:text-5xl leading-[1.05]">
+                  Our Features <br /> you will get
+                </h2>
+             </div>
+             <p className="max-w-md text-slate-500 text-base leading-relaxed mb-1">
+                Track your Google rankings and AI citations in real time. Know exactly where your brand stands — in search and in AI.
+             </p>
+             <Link href="/signup" className="font-display rounded-full bg-[#39ff14] px-6 py-2.5 text-sm font-bold text-black shadow-[0_0_20px_rgba(57,255,20,0.5)] hover:scale-105 transition-all active:scale-95">See All Features</Link>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {everythingFeatures.map((f) => (
+              <div
+                key={f.title}
+                className="group relative bg-slate-50 rounded-[40px] p-10 border border-slate-200 hover:border-[#39ff14]/40 overflow-hidden transition-all duration-500 flex flex-col justify-center"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[#39ff14]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10 flex items-center gap-3 mb-4">
+                  <span className="text-3xl">{f.icon}</span>
+                  <h3 className="font-display text-xl font-semibold text-slate-900 tracking-tight leading-tight">{f.title}</h3>
+                </div>
+                <p className="relative z-10 text-slate-500 text-sm leading-relaxed">
+                  {f.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ PRICING ═══════════════════════════════════════════════ */}
+      <section id="pricing" className="py-32 relative bg-[#050505]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#39ff14]/5 rounded-full blur-[140px] pointer-events-none" />
+
+        <div className="mx-auto max-w-5xl px-6 relative z-10">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-4xl font-normal text-white mb-3 leading-[1.05]">Simple, transparent pricing</h2>
+            <p className="text-slate-500 text-sm mb-8">No hidden fees. Cancel anytime.</p>
+
+            {/* Toggle */}
+            <div className="inline-flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 mb-3">
+              <button className="px-5 py-2 rounded-full text-sm font-medium text-white bg-white/10">Monthly</button>
+              <button className="px-5 py-2 rounded-full text-sm font-medium text-slate-400 flex items-center gap-2">
+                Annual
+                <span className="bg-[#39ff14] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">Save 25%</span>
+              </button>
+            </div>
+            <div className="block">
+              <button className="text-xs text-slate-500 hover:text-[#39ff14] transition-colors underline underline-offset-2">Have a coupon? Redeem here</button>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 items-stretch">
+            {/* Starter */}
+            <div className="rounded-[32px] p-8 border border-white/8 bg-white/[0.02] flex flex-col">
+              <p className="text-xs text-slate-500 mb-1 uppercase tracking-widest">For Freelancers &amp; Solos</p>
+              <h4 className="font-display text-2xl font-normal text-white mb-4">Starter</h4>
+              <div className="flex items-end gap-1 mb-1">
+                <span className="font-sans text-5xl font-light text-white leading-none">$9</span>
+                <span className="font-sans text-3xl font-light text-white leading-none mb-0.5">.99</span>
+                <span className="text-slate-500 text-sm mb-1">/mo</span>
+              </div>
+              <p className="text-xs text-slate-500 mb-8">Billed annually at $89.99 · Save $30</p>
+              <ul className="space-y-3 mb-8 flex-1">
+                {["5 keywords", "SERP rank tracking (top 100)", "Rank history charts", "Daily updates"].map(i => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-slate-400">
+                    <span className="text-[#39ff14] text-base">✓</span> {i}
+                  </li>
+                ))}
+              </ul>
+              <button className="w-full rounded-full border border-white/10 py-3 text-sm font-medium text-white hover:bg-white/5 transition-all">Get Started</button>
+            </div>
+
+            {/* Pro — featured */}
+            <div className="rounded-[32px] p-8 border border-[#39ff14]/20 bg-[#0f0f0f] flex flex-col shadow-[0_0_60px_rgba(57,255,20,0.08)] relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-[#39ff14] text-black text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest">Most Popular</span>
+              </div>
+              <p className="text-xs text-slate-400 mb-1 uppercase tracking-widest">For Growing Teams</p>
+              <h4 className="font-display text-2xl font-normal text-white mb-4">Pro</h4>
+              <div className="flex items-end gap-1 mb-1">
+                <span className="font-sans text-5xl font-light text-[#39ff14] leading-none">$24</span>
+                <span className="font-sans text-3xl font-light text-[#39ff14] leading-none mb-0.5">.99</span>
+                <span className="text-slate-500 text-sm mb-1">/mo</span>
+              </div>
+              <p className="text-xs text-slate-500 mb-8">Billed annually at $224.99 · Save $75</p>
+              <ul className="space-y-3 mb-8 flex-1">
+                {["60 keywords", "SERP rank tracking (top 100)", "AI citation monitoring", "Bulk parallel checks", "Multi-project dashboard", "Priority support"].map(i => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-white">
+                    <span className="text-[#39ff14] text-base">✓</span> {i}
+                  </li>
+                ))}
+              </ul>
+              <button className="font-display w-full rounded-full bg-[#39ff14] py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(57,255,20,0.4)] hover:scale-[1.02] transition-all">Start a Free Trial</button>
+            </div>
+
+            {/* Agency */}
+            <div className="rounded-[32px] p-8 border border-white/8 bg-white/[0.02] flex flex-col">
+              <p className="text-xs text-slate-500 mb-1 uppercase tracking-widest">For Agencies</p>
+              <h4 className="font-display text-2xl font-normal text-white mb-4">Agency</h4>
+              <div className="flex items-end gap-1 mb-1">
+                <span className="font-sans text-5xl font-light text-white leading-none">$69</span>
+                <span className="font-sans text-3xl font-light text-white leading-none mb-0.5">.99</span>
+                <span className="text-slate-500 text-sm mb-1">/mo</span>
+              </div>
+              <p className="text-xs text-slate-500 mb-8">Billed annually at $629.99 · Save $210</p>
+              <ul className="space-y-3 mb-8 flex-1">
+                {["Unlimited keywords", "Everything in Pro", "White-label reports", "Custom API access", "Dedicated account manager"].map(i => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-slate-400">
+                    <span className="text-[#39ff14] text-base">✓</span> {i}
+                  </li>
+                ))}
+              </ul>
+              <button className="w-full rounded-full border border-white/10 py-3 text-sm font-medium text-white hover:bg-white/5 transition-all">Contact Sales</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ FAQ ════════════════════════════════════════════════════ */}
+      <section id="faq" className="py-32 bg-[#080808]">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-4xl font-normal text-white mb-4 leading-[1.05]">Frequent Ask Questions</h2>
+            <p className="text-slate-500 text-sm">Grow your research through impactful, smart questions and seamless tools that help you reach further than ever before.</p>
+          </div>
+          <FaqAccordion faqs={objections} />
+        </div>
+      </section>
+
+      {/* ══ FOOTER ════════════════════════════════════════════════ */}
+      <footer className="pt-16 pb-10 bg-[#050505] border-t border-white/5">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex flex-col md:flex-row justify-between gap-12 mb-16">
+            {/* Brand */}
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2.5 mb-4">
+                <svg className="h-7 w-7 text-[#39ff14]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12,4 C8.13401,4 5,7.13401 5,11 L5,19.6207 C5,19.9257 5.32764,20.1185 5.59426,19.9703 L6.53669,19.4468 C7.75977,18.7673 9.249,18.7762 10.4638,19.4704 L11.0077,19.7812 C11.6226,20.1326 12.3774,20.1326 12.9923,19.7812 L13.5362,19.4704 C14.751,18.7762 16.2402,18.7673 17.4633,19.4468 L18.4057,19.9703 C18.6724,20.1185 19,19.9257 19,19.6207 L19,11 C19,7.13401 15.866,4 12,4 Z M3,11 C3,6.02944 7.02944,2 12,2 C16.9706,2 21,6.02944 21,11 L21,19.6207 C21,21.4506 19.0341,22.6074 17.4345,21.7187 L16.492,21.1951 C15.8805,20.8553 15.1359,20.8598 14.5285,21.2069 L13.9846,21.5177 C12.7548,22.2204 11.2452,22.2204 10.0154,21.5177 L9.47154,21.2069 C8.86413,20.8598 8.11951,20.8553 7.50797,21.1951 L6.56554,21.7187 C4.96587,22.6074 3,21.4506 3,19.6207 L3,11 Z M10.5,10.5 C10.5,11.3284 9.82843,12 9,12 C8.17157,12 7.5,11.3284 7.5,10.5 C7.5,9.67157 8.17157,9 9,9 C9.82843,9 10.5,9.67157 10.5,10.5 Z M15,12 C15.8284,12 16.5,11.3284 16.5,10.5 C16.5,9.67157 15.8284,9 15,9 C14.1716,9 13.5,9.67157 13.5,10.5 C13.5,11.3284 14.1716,12 15,12 Z" fill="currentColor"/>
+                </svg>
+                <span className="font-display text-lg font-bold text-white">RankGhost</span>
+              </div>
+              <p className="text-slate-500 text-sm leading-relaxed mb-4">
+                Track your SERP rankings and AI citations in real time. Know where your brand stands.
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] text-slate-600 uppercase tracking-widest mr-1">Secured by</span>
+                {/* PayPal */}
+                <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded px-2 py-1">
+                  <svg className="h-3.5" viewBox="0 0 100 26" xmlns="http://www.w3.org/2000/svg">
+                    <text y="20" fontSize="20" fontWeight="bold" fill="#009cde" fontFamily="Arial">Pay</text>
+                    <text x="36" y="20" fontSize="20" fontWeight="bold" fill="#012169" fontFamily="Arial">Pal</text>
+                  </svg>
+                </div>
+                {/* SSL */}
+                <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded px-2 py-1">
+                  <svg className="h-3 w-3 text-[#39ff14]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                  <span className="text-[10px] text-slate-400 font-medium">SSL</span>
+                </div>
+                {/* Visa */}
+                <div className="flex items-center bg-white/5 border border-white/10 rounded px-2 py-1">
+                  <svg className="h-3.5" viewBox="0 0 60 20" xmlns="http://www.w3.org/2000/svg">
+                    <text y="15" fontSize="15" fontWeight="bold" fill="#1a1f71" fontFamily="Arial">VISA</text>
+                  </svg>
+                </div>
+                {/* Mastercard */}
+                <div className="flex items-center gap-0.5 bg-white/5 border border-white/10 rounded px-2 py-1">
+                  <div className="h-3.5 w-3.5 rounded-full bg-[#eb001b]" />
+                  <div className="h-3.5 w-3.5 rounded-full bg-[#f79e1b] -ml-1.5" />
+                </div>
+              </div>
+            </div>
+
+            {/* Links */}
+            <div className="grid grid-cols-3 gap-12">
+              <div>
+                <h5 className="text-white text-sm font-semibold mb-4">Product</h5>
+                <ul className="space-y-3 text-sm">
+                  {["Features", "Pricing", "Changelog", "Roadmap"].map(l => (
+                    <li key={l}><Link href="#" className="text-slate-500 hover:text-[#39ff14] transition-colors">{l}</Link></li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h5 className="text-white text-sm font-semibold mb-4">Company</h5>
+                <ul className="space-y-3 text-sm">
+                  {["About", "Blog", "Careers", "Contact"].map(l => (
+                    <li key={l}><Link href="#" className="text-slate-500 hover:text-[#39ff14] transition-colors">{l}</Link></li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h5 className="text-white text-sm font-semibold mb-4">Legal</h5>
+                <ul className="space-y-3 text-sm">
+                  {["Privacy", "Terms", "Cookies"].map(l => (
+                    <li key={l}><Link href="#" className="text-slate-500 hover:text-[#39ff14] transition-colors">{l}</Link></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-slate-600 text-xs">© 2026 RankGhost. All rights reserved.</p>
+            <p className="text-slate-600 text-xs">AI-Powered SEO Tracking</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
