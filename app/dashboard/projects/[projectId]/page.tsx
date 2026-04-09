@@ -270,7 +270,7 @@ export default function ProjectKeywordsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                   <p className="text-slate-400 text-sm mb-1">No keywords yet</p>
-                  <p className="text-slate-400 text-xs">Click "Add Keyword" to start tracking.</p>
+                  <p className="text-slate-400 text-xs">Click &quot;Add Keyword&quot; to start tracking.</p>
                 </div>
               ) : (
                 <table className="w-full text-sm">
