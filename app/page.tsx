@@ -1,7 +1,10 @@
+"use client";
+
 import { FaqAccordion } from "@/components/faq-accordion";
 import { LandingNav } from "@/components/landing-nav";
 import { TiltCard } from "@/components/tilt-card";
 import Link from "next/link";
+import { useState } from "react";
 
 /* ─── data ─────────────────────────────────────────────────── */
 
@@ -22,95 +25,117 @@ const objections = [
   { q: "Is the free plan actually useful?", a: "Yes — 5 keywords, full SERP tracking, rank history charts. No credit card. It's a real product, not a teaser." },
 ];
 
+const plans = [
+  {
+    label: "For Freelancers & Solos",
+    name: "Starter",
+    monthly: { price: "13", cents: ".99", note: "Billed monthly · No commitment" },
+    yearly:  { price: "9",  cents: ".99", note: "Billed annually · Save $48/yr" },
+    features: ["5 keywords", "SERP rank tracking (top 100)", "Rank history charts", "Daily updates"],
+    cta: "Get Started",
+    featured: false,
+  },
+  {
+    label: "For Growing Teams",
+    name: "Pro",
+    monthly: { price: "34", cents: ".99", note: "Billed monthly · No commitment" },
+    yearly:  { price: "24", cents: ".99", note: "Billed annually · Save $120/yr" },
+    features: ["60 keywords", "SERP rank tracking (top 100)", "AI citation monitoring", "Bulk parallel checks", "Multi-project dashboard", "Priority support"],
+    cta: "Start a Free Trial",
+    featured: true,
+  },
+  {
+    label: "For Agencies",
+    name: "Agency",
+    monthly: { price: "99", cents: ".99", note: "Billed monthly · No commitment" },
+    yearly:  { price: "69", cents: ".99", note: "Billed annually · Save $360/yr" },
+    features: ["Unlimited keywords", "Everything in Pro", "White-label reports", "Custom API access", "Dedicated account manager"],
+    cta: "Contact Sales",
+    featured: false,
+  },
+];
+
 /* ─── page ──────────────────────────────────────────────────── */
 
 export default function Home() {
+  const [isYearly, setIsYearly] = useState(true);
+
   return (
     <div className="min-h-screen bg-white font-sans text-slate-200">
       <LandingNav />
 
       {/* ══ HERO ═════════════════════════════════════════════════ */}
-      <section className="relative flex flex-col items-center px-6 pt-28 pb-6 md:pt-36 bg-[#050505] rounded-b-[3rem]">
-        {/* Green radial gradient — centered in hero like the screenshot */}
+      <section className="relative flex flex-col items-center px-4 sm:px-6 pt-28 pb-6 md:pt-36 bg-[#050505] rounded-b-[2rem] md:rounded-b-[3rem]">
+        {/* Green radial glow */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-[600px] w-[900px] rounded-full bg-[#39ff14]/25 blur-[140px]" />
+          <div className="h-[400px] w-[600px] md:h-[600px] md:w-[900px] rounded-full bg-[#39ff14]/25 blur-[140px]" />
         </div>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-[300px] w-[400px] rounded-full bg-[#39ff14]/30 blur-[80px]" />
+          <div className="h-[200px] w-[300px] md:h-[300px] md:w-[400px] rounded-full bg-[#39ff14]/30 blur-[80px]" />
         </div>
 
         {/* Badge */}
-        <div className="relative z-10 mb-8 inline-flex items-center gap-2 rounded-full bg-[#111] px-5 py-2 border border-white/10">
-          <svg className="h-4 w-4 text-[#39ff14]" viewBox="0 0 24 24" fill="currentColor">
+        <div className="relative z-10 mb-8 inline-flex items-center gap-2 rounded-full bg-[#111] px-4 py-2 sm:px-5 border border-white/10">
+          <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#39ff14]" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
           </svg>
-          <span className="text-xs font-semibold text-slate-300">Latest feature just launched</span>
+          <span className="text-[11px] sm:text-xs font-semibold text-slate-300">Latest feature just launched</span>
         </div>
 
         {/* Heading */}
-        <div className="relative z-10 mx-auto max-w-4xl text-center">
+        <div className="relative z-10 mx-auto max-w-4xl text-center w-full">
           <h1 className="font-display font-normal leading-[1.1] tracking-tight">
-            <span className="block text-5xl text-white md:text-7xl lg:text-[6rem] whitespace-nowrap">Does AI</span>
-            <span className="block text-5xl md:text-7xl lg:text-[6rem] green-gradient-text whitespace-nowrap">know you exist?</span>
+            <span className="block text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] text-white">Does AI</span>
+            <span className="block text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] green-gradient-text">know you exist?</span>
           </h1>
 
-          <p className="mx-auto mt-8 max-w-lg text-base leading-relaxed text-white md:text-lg">
+          <p className="mx-auto mt-6 sm:mt-8 max-w-lg text-sm sm:text-base leading-relaxed text-white md:text-lg">
             Know where you rank. Know when AI cites you.
           </p>
 
-          <p className="mx-auto mt-2 max-w-lg text-sm text-white/60">
+          <p className="mx-auto mt-2 max-w-lg text-xs sm:text-sm text-white/60">
             Your brand in Google. Your brand in AI. We track both.
           </p>
 
-          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-8 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/signup"
-              className="font-display inline-block rounded-full bg-[#39ff14] px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_24px_rgba(57,255,20,0.4)] transition-all hover:scale-105 active:scale-95"
+              className="font-display inline-block w-full sm:w-auto rounded-full bg-[#39ff14] px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_24px_rgba(57,255,20,0.4)] transition-all hover:scale-105 active:scale-95 text-center"
             >
               Start a Free Trial
             </Link>
             <Link
               href="/login"
-              className="font-display inline-block rounded-full border border-white/10 px-8 py-3.5 text-sm font-medium text-slate-300 transition-all hover:border-white/20 hover:text-white"
+              className="font-display inline-block w-full sm:w-auto rounded-full border border-white/20 px-8 py-3.5 text-sm font-medium text-white transition-all hover:border-white/40 hover:bg-white/5 text-center"
             >
               Sign in →
             </Link>
           </div>
         </div>
 
-        {/* Dashboard mockup — sits below the CTA, bleeds to edge */}
-        <TiltCard className="relative z-10 mt-16 w-full max-w-6xl mx-auto">
-          {/* Fade out at bottom */}
+        {/* Dashboard mockup */}
+        <TiltCard className="relative z-10 mt-12 sm:mt-16 w-full max-w-6xl mx-auto">
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 z-20 bg-gradient-to-t from-[#050505] to-transparent" />
-          <div className="relative rounded-[24px] border border-white/10 bg-[#0e0e0e] overflow-hidden shadow-[0_-20px_80px_rgba(57,255,20,0.08)]">
+          <div className="relative rounded-[16px] sm:rounded-[24px] border border-white/10 bg-[#0e0e0e] overflow-hidden shadow-[0_-20px_80px_rgba(57,255,20,0.08)]">
             {/* Top bar */}
-            <div className="flex items-center gap-4 border-b border-white/5 bg-[#0a0a0a] px-6 py-3">
-              {/* Logo area */}
-              <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded bg-[#39ff14]/20 border border-[#39ff14]/30 flex items-center justify-center">
-                  <span className="text-[10px] font-black text-[#39ff14]">R</span>
+            <div className="flex items-center gap-2 sm:gap-4 border-b border-white/5 bg-[#0a0a0a] px-3 sm:px-6 py-3">
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="h-5 w-5 sm:h-6 sm:w-6 rounded bg-[#39ff14]/20 border border-[#39ff14]/30 flex items-center justify-center">
+                  <span className="text-[9px] sm:text-[10px] font-black text-[#39ff14]">R</span>
                 </div>
-                <span className="text-xs font-bold text-white tracking-wide">RANKGHOST</span>
+                <span className="text-[11px] sm:text-xs font-bold text-white tracking-wide">RANKGHOST</span>
               </div>
-              {/* Site selector */}
-              <div className="flex items-center gap-2 ml-6">
+              <div className="hidden sm:flex items-center gap-2 ml-6">
                 <span className="text-[10px] text-slate-500">Selected Site:</span>
                 <div className="flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-3 py-1">
                   <span className="text-xs text-white font-medium">mysite.com</span>
                   <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </div>
               </div>
-              {/* Add site button */}
-              <button className="ml-2 rounded-md bg-[#39ff14] px-3 py-1 text-[10px] font-bold text-black">+ Add new site</button>
-              {/* Search */}
-              <div className="ml-auto flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-4 py-1.5 w-48">
-                <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" d="m21 21-4.35-4.35"/></svg>
-                <span className="text-[10px] text-slate-500">Search</span>
-              </div>
-              {/* User */}
-              <div className="flex items-center gap-2 ml-4">
-                <div className="h-7 w-7 rounded-full bg-white/10 border border-white/20" />
-                <div>
+              <button className="hidden sm:block ml-2 rounded-md bg-[#39ff14] px-3 py-1 text-[10px] font-bold text-black shrink-0">+ Add new site</button>
+              <div className="ml-auto flex items-center gap-2">
+                <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-white/10 border border-white/20 shrink-0" />
+                <div className="hidden sm:block">
                   <div className="text-[10px] font-bold text-white leading-none">Raj H.</div>
                   <div className="text-[9px] text-[#39ff14] leading-none mt-0.5">Pro Member</div>
                 </div>
@@ -118,8 +143,7 @@ export default function Home() {
             </div>
 
             {/* Dashboard body */}
-            <div className="grid md:grid-cols-[180px_1fr] min-h-[420px]">
-              {/* Sidebar */}
+            <div className="grid md:grid-cols-[180px_1fr] min-h-[300px] sm:min-h-[420px]">
               <div className="hidden border-r border-white/5 md:flex flex-col gap-1 p-4">
                 {[
                   { label: "Dashboard", active: true },
@@ -135,58 +159,57 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Main content */}
-              <div className="p-6">
-                {/* Stats row */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="p-3 sm:p-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   {[
                     { label: "Unique Visitors", value: "34,521", trend: "+12%" },
                     { label: "Avg. SERP Rank", value: "#14.3", trend: "↑ 3" },
                     { label: "AI Citations", value: "8 / 20", trend: "cited" },
                     { label: "SEO Health", value: "95%", trend: "↑" },
                   ].map((stat) => (
-                    <div key={stat.label} className="rounded-xl border border-white/5 bg-[#111] p-4">
-                      <p className="text-[10px] text-slate-500 mb-1">{stat.label}</p>
-                      <p className="text-lg font-black text-white leading-none">{stat.value}</p>
-                      <p className="text-[10px] text-[#39ff14] mt-1">{stat.trend}</p>
+                    <div key={stat.label} className="rounded-xl border border-white/5 bg-[#111] p-2.5 sm:p-4">
+                      <p className="text-[9px] sm:text-[10px] text-slate-500 mb-1 truncate">{stat.label}</p>
+                      <p className="text-sm sm:text-lg font-black text-white leading-none">{stat.value}</p>
+                      <p className="text-[9px] sm:text-[10px] text-[#39ff14] mt-1">{stat.trend}</p>
                     </div>
                   ))}
                 </div>
 
-                {/* Keyword table */}
                 <div className="rounded-xl border border-white/5 bg-[#111] overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/5">
-                    <span className="text-xs font-bold text-white">Keyword Rankings</span>
-                    <span className="text-[10px] text-slate-500">Last checked: just now</span>
+                  <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3 border-b border-white/5">
+                    <span className="text-[11px] sm:text-xs font-bold text-white">Keyword Rankings</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-500">Last checked: just now</span>
                   </div>
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="border-b border-white/5">
-                        {["Keyword", "SERP Rank", "Change", "AI Citation"].map(h => (
-                          <th key={h} className="px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[
-                        { kw: "hostinger review", rank: "#4", change: "+2", ai: "cited" },
-                        { kw: "best web hosting 2024", rank: "#11", change: "-1", ai: "not_found" },
-                        { kw: "cheap vps hosting", rank: "#7", change: "+5", ai: "cited" },
-                        { kw: "wordpress hosting plans", rank: "#19", change: "–", ai: "not_found" },
-                      ].map((row) => (
-                        <tr key={row.kw} className="border-b border-white/[0.03]">
-                          <td className="px-5 py-3 text-xs text-white font-medium">{row.kw}</td>
-                          <td className="px-5 py-3 text-xs text-[#39ff14] font-bold">{row.rank}</td>
-                          <td className="px-5 py-3 text-xs text-slate-400">{row.change}</td>
-                          <td className="px-5 py-3">
-                            <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${row.ai === "cited" ? "bg-[#39ff14]/10 text-[#39ff14] border border-[#39ff14]/20" : "bg-white/5 text-slate-500 border border-white/5"}`}>
-                              {row.ai === "cited" ? "Cited" : "Not found"}
-                            </span>
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left min-w-[360px]">
+                      <thead>
+                        <tr className="border-b border-white/5">
+                          {["Keyword", "SERP Rank", "Change", "AI Citation"].map(h => (
+                            <th key={h} className="px-3 sm:px-5 py-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {[
+                          { kw: "hostinger review", rank: "#4", change: "+2", ai: "cited" },
+                          { kw: "best web hosting 2024", rank: "#11", change: "-1", ai: "not_found" },
+                          { kw: "cheap vps hosting", rank: "#7", change: "+5", ai: "cited" },
+                          { kw: "wordpress hosting plans", rank: "#19", change: "–", ai: "not_found" },
+                        ].map((row) => (
+                          <tr key={row.kw} className="border-b border-white/[0.03]">
+                            <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] sm:text-xs text-white font-medium">{row.kw}</td>
+                            <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] sm:text-xs text-[#39ff14] font-bold">{row.rank}</td>
+                            <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] sm:text-xs text-slate-400">{row.change}</td>
+                            <td className="px-3 sm:px-5 py-2.5 sm:py-3">
+                              <span className={`rounded-full px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold ${row.ai === "cited" ? "bg-[#39ff14]/10 text-[#39ff14] border border-[#39ff14]/20" : "bg-white/5 text-slate-500 border border-white/5"}`}>
+                                {row.ai === "cited" ? "Cited" : "Not found"}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -195,30 +218,30 @@ export default function Home() {
       </section>
 
       {/* ══ FEATURES BENTO ═════════════════════════════════════════ */}
-      <section id="features" className="pt-12 pb-32 relative bg-white">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
-             <div className="max-w-xl text-left">
-                <h2 className="font-display text-4xl font-normal text-slate-900 md:text-5xl leading-[1.05]">
-                  Our Features <br /> you will get
-                </h2>
-             </div>
-             <p className="max-w-md text-slate-500 text-base leading-relaxed mb-1">
-                Track your Google rankings and AI citations in real time. Know exactly where your brand stands — in search and in AI.
-             </p>
-             <Link href="/signup" className="font-display rounded-full bg-[#39ff14] px-6 py-2.5 text-sm font-bold text-black shadow-[0_0_20px_rgba(57,255,20,0.5)] hover:scale-105 transition-all active:scale-95">See All Features</Link>
+      <section id="features" className="pt-12 pb-24 sm:pb-32 relative bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+            <div className="max-w-xl text-left">
+              <h2 className="font-display text-3xl sm:text-4xl font-normal text-slate-900 md:text-5xl leading-[1.05]">
+                Our Features <br /> you will get
+              </h2>
+            </div>
+            <p className="max-w-md text-slate-500 text-sm sm:text-base leading-relaxed">
+              Track your Google rankings and AI citations in real time. Know exactly where your brand stands — in search and in AI.
+            </p>
+            <Link href="/signup" className="font-display rounded-full bg-[#39ff14] px-6 py-2.5 text-sm font-bold text-black shadow-[0_0_20px_rgba(57,255,20,0.5)] hover:scale-105 transition-all active:scale-95 shrink-0">See All Features</Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
             {everythingFeatures.map((f) => (
               <div
                 key={f.title}
-                className="group relative bg-slate-50 rounded-[40px] p-10 border border-slate-200 hover:border-[#39ff14]/40 overflow-hidden transition-all duration-500 flex flex-col justify-center"
+                className="group relative bg-slate-50 rounded-[28px] sm:rounded-[40px] p-7 sm:p-10 border border-slate-200 hover:border-[#39ff14]/40 overflow-hidden transition-all duration-500 flex flex-col justify-center"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#39ff14]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative z-10 flex items-center gap-3 mb-4">
                   <span className="text-3xl">{f.icon}</span>
-                  <h3 className="font-display text-xl font-semibold text-slate-900 tracking-tight leading-tight">{f.title}</h3>
+                  <h3 className="font-display text-lg sm:text-xl font-semibold text-slate-900 tracking-tight leading-tight">{f.title}</h3>
                 </div>
                 <p className="relative z-10 text-slate-500 text-sm leading-relaxed">
                   {f.desc}
@@ -230,18 +253,26 @@ export default function Home() {
       </section>
 
       {/* ══ PRICING ═══════════════════════════════════════════════ */}
-      <section id="pricing" className="py-32 relative bg-[#050505]">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#39ff14]/5 rounded-full blur-[140px] pointer-events-none" />
+      <section id="pricing" className="py-24 sm:py-32 relative bg-[#050505]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-[#39ff14]/5 rounded-full blur-[140px] pointer-events-none" />
 
-        <div className="mx-auto max-w-5xl px-6 relative z-10">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 relative z-10">
           <div className="text-center mb-10">
-            <h2 className="font-display text-4xl font-normal text-white mb-3 leading-[1.05]">Simple, transparent pricing</h2>
+            <h2 className="font-display text-3xl sm:text-4xl font-normal text-white mb-3 leading-[1.05]">Simple, transparent pricing</h2>
             <p className="text-slate-500 text-sm mb-8">No hidden fees. Cancel anytime.</p>
 
-            {/* Toggle */}
+            {/* Billing toggle */}
             <div className="inline-flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 mb-3">
-              <button className="px-5 py-2 rounded-full text-sm font-medium text-white bg-white/10">Monthly</button>
-              <button className="px-5 py-2 rounded-full text-sm font-medium text-slate-400 flex items-center gap-2">
+              <button
+                onClick={() => setIsYearly(false)}
+                className={`px-4 sm:px-5 py-2 rounded-full text-sm font-medium transition-all ${!isYearly ? "bg-white/15 text-white" : "text-slate-400 hover:text-slate-200"}`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setIsYearly(true)}
+                className={`px-4 sm:px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${isYearly ? "bg-white/15 text-white" : "text-slate-400 hover:text-slate-200"}`}
+              >
                 Annual
                 <span className="bg-[#39ff14] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">Save 25%</span>
               </button>
@@ -251,78 +282,63 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 items-stretch">
-            {/* Starter */}
-            <div className="rounded-[32px] p-8 border border-white/8 bg-white/[0.02] flex flex-col">
-              <p className="text-xs text-slate-500 mb-1 uppercase tracking-widest">For Freelancers &amp; Solos</p>
-              <h4 className="font-display text-2xl font-normal text-white mb-4">Starter</h4>
-              <div className="flex items-end gap-1 mb-1">
-                <span className="font-sans text-5xl font-light text-white leading-none">$9</span>
-                <span className="font-sans text-3xl font-light text-white leading-none mb-0.5">.99</span>
-                <span className="text-slate-500 text-sm mb-1">/mo</span>
-              </div>
-              <p className="text-xs text-slate-500 mb-8">Billed annually at $89.99 · Save $30</p>
-              <ul className="space-y-3 mb-8 flex-1">
-                {["5 keywords", "SERP rank tracking (top 100)", "Rank history charts", "Daily updates"].map(i => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-slate-400">
-                    <span className="text-[#39ff14] text-base">✓</span> {i}
-                  </li>
-                ))}
-              </ul>
-              <button className="w-full rounded-full border border-white/10 py-3 text-sm font-medium text-white hover:bg-white/5 transition-all">Get Started</button>
-            </div>
-
-            {/* Pro — featured */}
-            <div className="rounded-[32px] p-8 border border-[#39ff14]/20 bg-[#0f0f0f] flex flex-col shadow-[0_0_60px_rgba(57,255,20,0.08)] relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-[#39ff14] text-black text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest">Most Popular</span>
-              </div>
-              <p className="text-xs text-slate-400 mb-1 uppercase tracking-widest">For Growing Teams</p>
-              <h4 className="font-display text-2xl font-normal text-white mb-4">Pro</h4>
-              <div className="flex items-end gap-1 mb-1">
-                <span className="font-sans text-5xl font-light text-[#39ff14] leading-none">$24</span>
-                <span className="font-sans text-3xl font-light text-[#39ff14] leading-none mb-0.5">.99</span>
-                <span className="text-slate-500 text-sm mb-1">/mo</span>
-              </div>
-              <p className="text-xs text-slate-500 mb-8">Billed annually at $224.99 · Save $75</p>
-              <ul className="space-y-3 mb-8 flex-1">
-                {["60 keywords", "SERP rank tracking (top 100)", "AI citation monitoring", "Bulk parallel checks", "Multi-project dashboard", "Priority support"].map(i => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-white">
-                    <span className="text-[#39ff14] text-base">✓</span> {i}
-                  </li>
-                ))}
-              </ul>
-              <button className="font-display w-full rounded-full bg-[#39ff14] py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(57,255,20,0.4)] hover:scale-[1.02] transition-all">Start a Free Trial</button>
-            </div>
-
-            {/* Agency */}
-            <div className="rounded-[32px] p-8 border border-white/8 bg-white/[0.02] flex flex-col">
-              <p className="text-xs text-slate-500 mb-1 uppercase tracking-widest">For Agencies</p>
-              <h4 className="font-display text-2xl font-normal text-white mb-4">Agency</h4>
-              <div className="flex items-end gap-1 mb-1">
-                <span className="font-sans text-5xl font-light text-white leading-none">$69</span>
-                <span className="font-sans text-3xl font-light text-white leading-none mb-0.5">.99</span>
-                <span className="text-slate-500 text-sm mb-1">/mo</span>
-              </div>
-              <p className="text-xs text-slate-500 mb-8">Billed annually at $629.99 · Save $210</p>
-              <ul className="space-y-3 mb-8 flex-1">
-                {["Unlimited keywords", "Everything in Pro", "White-label reports", "Custom API access", "Dedicated account manager"].map(i => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-slate-400">
-                    <span className="text-[#39ff14] text-base">✓</span> {i}
-                  </li>
-                ))}
-              </ul>
-              <button className="w-full rounded-full border border-white/10 py-3 text-sm font-medium text-white hover:bg-white/5 transition-all">Contact Sales</button>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 items-stretch">
+            {plans.map((plan) => {
+              const pricing = isYearly ? plan.yearly : plan.monthly;
+              return (
+                <div
+                  key={plan.name}
+                  className={`rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 border flex flex-col relative ${
+                    plan.featured
+                      ? "border-[#39ff14]/20 bg-[#0f0f0f] shadow-[0_0_60px_rgba(57,255,20,0.08)]"
+                      : "border-white/[0.08] bg-white/[0.02]"
+                  }`}
+                >
+                  {plan.featured && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-[#39ff14] text-black text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap">Most Popular</span>
+                    </div>
+                  )}
+                  <p className="text-xs text-slate-500 mb-1 uppercase tracking-widest">{plan.label}</p>
+                  <h4 className="font-display text-2xl font-normal text-white mb-4">{plan.name}</h4>
+                  <div className="flex items-end gap-1 mb-1">
+                    <span className={`font-sans text-4xl sm:text-5xl font-light leading-none ${plan.featured ? "text-[#39ff14]" : "text-white"}`}>
+                      ${pricing.price}
+                    </span>
+                    <span className={`font-sans text-2xl sm:text-3xl font-light leading-none mb-0.5 ${plan.featured ? "text-[#39ff14]" : "text-white"}`}>
+                      {pricing.cents}
+                    </span>
+                    <span className="text-slate-500 text-sm mb-1">/mo</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-6 sm:mb-8">{pricing.note}</p>
+                  <ul className="space-y-3 mb-6 sm:mb-8 flex-1">
+                    {plan.features.map(item => (
+                      <li key={item} className={`flex items-center gap-3 text-sm ${plan.featured ? "text-white" : "text-slate-400"}`}>
+                        <span className="text-[#39ff14] text-base shrink-0">✓</span> {item}
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.featured ? (
+                    <button className="font-display w-full rounded-full bg-[#39ff14] py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(57,255,20,0.4)] hover:scale-[1.02] transition-all">
+                      {plan.cta}
+                    </button>
+                  ) : (
+                    <button className="w-full rounded-full border border-white/15 py-3 text-sm font-medium text-white hover:bg-white/5 transition-all">
+                      {plan.cta}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ══ FAQ ════════════════════════════════════════════════════ */}
-      <section id="faq" className="py-32 bg-[#080808]">
-        <div className="mx-auto max-w-3xl px-6">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-normal text-white mb-4 leading-[1.05]">Frequent Ask Questions</h2>
+      <section id="faq" className="py-24 sm:py-32 bg-[#080808]">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="font-display text-3xl sm:text-4xl font-normal text-white mb-4 leading-[1.05]">Frequent Ask Questions</h2>
             <p className="text-slate-500 text-sm">Grow your research through impactful, smart questions and seamless tools that help you reach further than ever before.</p>
           </div>
           <FaqAccordion faqs={objections} />
@@ -330,9 +346,9 @@ export default function Home() {
       </section>
 
       {/* ══ FOOTER ════════════════════════════════════════════════ */}
-      <footer className="pt-16 pb-10 bg-[#050505] border-t border-white/5">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex flex-col md:flex-row justify-between gap-12 mb-16">
+      <footer className="pt-12 sm:pt-16 pb-10 bg-[#050505] border-t border-white/5">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row justify-between gap-10 sm:gap-12 mb-12 sm:mb-16">
             {/* Brand */}
             <div className="max-w-xs">
               <div className="flex items-center gap-2.5 mb-4">
@@ -344,25 +360,22 @@ export default function Home() {
               <p className="text-slate-500 text-sm leading-relaxed mb-4">
                 Track your SERP rankings and AI citations in real time. Know where your brand stands.
               </p>
+              {/* Secured by badges */}
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[10px] text-slate-600 uppercase tracking-widest mr-1">Secured by</span>
                 {/* PayPal */}
                 <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded px-2 py-1">
-                  <svg className="h-3.5" viewBox="0 0 100 26" xmlns="http://www.w3.org/2000/svg">
-                    <text y="20" fontSize="20" fontWeight="bold" fill="#009cde" fontFamily="Arial">Pay</text>
-                    <text x="36" y="20" fontSize="20" fontWeight="bold" fill="#012169" fontFamily="Arial">Pal</text>
-                  </svg>
+                  <span className="text-[11px] font-bold text-white leading-none">Pay</span>
+                  <span className="text-[11px] font-bold text-slate-300 leading-none">Pal</span>
                 </div>
                 {/* SSL */}
                 <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded px-2 py-1">
                   <svg className="h-3 w-3 text-[#39ff14]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-                  <span className="text-[10px] text-slate-400 font-medium">SSL</span>
+                  <span className="text-[10px] text-white font-medium">SSL</span>
                 </div>
                 {/* Visa */}
                 <div className="flex items-center bg-white/5 border border-white/10 rounded px-2 py-1">
-                  <svg className="h-3.5" viewBox="0 0 60 20" xmlns="http://www.w3.org/2000/svg">
-                    <text y="15" fontSize="15" fontWeight="bold" fill="#1a1f71" fontFamily="Arial">VISA</text>
-                  </svg>
+                  <span className="text-[11px] font-bold text-white tracking-wider leading-none">VISA</span>
                 </div>
                 {/* Mastercard */}
                 <div className="flex items-center gap-0.5 bg-white/5 border border-white/10 rounded px-2 py-1">
@@ -373,7 +386,7 @@ export default function Home() {
             </div>
 
             {/* Links */}
-            <div className="grid grid-cols-3 gap-12">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12">
               <div>
                 <h5 className="text-white text-sm font-semibold mb-4">Product</h5>
                 <ul className="space-y-3 text-sm">
