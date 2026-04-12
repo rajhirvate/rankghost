@@ -1,8 +1,11 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { getClientDb } from "@/lib/firebase";
 import { PLAN_LIMITS } from "@/lib/plans";
+import { collection, getDocs } from "firebase/firestore";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const GHOST_PATH = "M12,4 C8.13401,4 5,7.13401 5,11 L5,19.6207 C5,19.9257 5.32764,20.1185 5.59426,19.9703 L6.53669,19.4468 C7.75977,18.7673 9.249,18.7762 10.4638,19.4704 L11.0077,19.7812 C11.6226,20.1326 12.3774,20.1326 12.9923,19.7812 L13.5362,19.4704 C14.751,18.7762 16.2402,18.7673 17.4633,19.4468 L18.4057,19.9703 C18.6724,20.1185 19,19.9257 19,19.6207 L19,11 C19,7.13401 15.866,4 12,4 Z M3,11 C3,6.02944 7.02944,2 12,2 C16.9706,2 21,6.02944 21,11 L21,19.6207 C21,21.4506 19.0341,22.6074 17.4345,21.7187 L16.492,21.1951 C15.8805,20.8553 15.1359,20.8598 14.5285,21.2069 L13.9846,21.5177 C12.7548,22.2204 11.2452,22.2204 10.0154,21.5177 L9.47154,21.2069 C8.86413,20.8598 8.11951,20.8553 7.50797,21.1951 L6.56554,21.7187 C4.96587,22.6074 3,21.4506 3,19.6207 L3,11 Z M10.5,10.5 C10.5,11.3284 9.82843,12 9,12 C8.17157,12 7.5,11.3284 7.5,10.5 C7.5,9.67157 8.17157,9 9,9 C9.82843,9 10.5,9.67157 10.5,10.5 Z M15,12 C15.8284,12 16.5,11.3284 16.5,10.5 C16.5,9.67157 15.8284,9 15,9 C14.1716,9 13.5,9.67157 13.5,10.5 C13.5,11.3284 14.1716,12 15,12 Z";
@@ -44,9 +47,26 @@ const nav = [
 export function DashboardSidebar() {
   const { user, plan, logout } = useAuth();
   const pathname = usePathname();
+  const [keywordCount, setKeywordCount] = useState(0);
 
   const keywordLimit = PLAN_LIMITS[plan]?.keywords ?? 5;
   const initials = user?.email?.[0]?.toUpperCase() ?? "U";
+  const usagePct = Math.min((keywordCount / keywordLimit) * 100, 100);
+
+  useEffect(() => {
+    if (!user) return;
+    const db = getClientDb();
+    const load = async () => {
+      const projects = await getDocs(collection(db, "users", user.uid, "projects"));
+      let total = 0;
+      for (const p of projects.docs) {
+        const kws = await getDocs(collection(db, "users", user.uid, "projects", p.id, "keywords"));
+        total += kws.size;
+      }
+      setKeywordCount(total);
+    };
+    load().catch(console.error);
+  }, [user]);
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-60 flex flex-col bg-[#0d0d0d] border-r border-white/[0.06] z-40">
@@ -97,10 +117,13 @@ export function DashboardSidebar() {
         </div>
         <div className="flex items-center justify-between mb-2">
           <p className="text-xs text-white/60">Keywords used</p>
-          <p className="text-xs font-semibold text-white">0 / {keywordLimit}</p>
+          <p className="text-xs font-semibold text-white">{keywordCount} / {keywordLimit}</p>
         </div>
         <div className="h-1.5 rounded-full bg-white/[0.08] mb-3 overflow-hidden">
-          <div className="h-full rounded-full bg-[#39ff14] w-0" />
+          <div
+            className="h-full rounded-full bg-[#39ff14] transition-all duration-700"
+            style={{ width: `${usagePct}%` }}
+          />
         </div>
         {plan === "free" && (
           <Link
