@@ -106,7 +106,7 @@ export default function Home() {
             </Link>
             <Link
               href="/login"
-              className="font-display inline-block w-full sm:w-auto rounded-full border border-white/20 px-8 py-3.5 text-sm font-medium text-white transition-all hover:border-white/40 hover:bg-white/5 text-center"
+              className="font-display inline-block w-full sm:w-auto rounded-full bg-white px-8 py-3.5 text-sm font-bold text-black transition-all hover:bg-white/90 active:scale-95 text-center"
             >
               Sign in →
             </Link>
