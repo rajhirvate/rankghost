@@ -90,14 +90,17 @@ export function DashboardSidebar() {
       </nav>
 
       {/* Plan card */}
-      <div className="mx-3 mb-3 rounded-xl bg-white/[0.04] border border-white/[0.06] p-4">
-        <div className="flex items-center justify-between mb-1">
+      <div className="mx-3 mb-3 rounded-xl bg-white/[0.05] border border-white/[0.09] p-4">
+        <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-semibold text-white capitalize">{plan} Plan</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">{plan}</span>
+          <span className="rounded-full bg-[#39ff14]/15 border border-[#39ff14]/25 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#39ff14]">{plan}</span>
         </div>
-        <p className="text-xs text-white/40 mb-3">0 / {keywordLimit} keywords</p>
-        <div className="h-1 rounded-full bg-white/[0.08] mb-3">
-          <div className="h-1 rounded-full bg-[#39ff14] w-0" />
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs text-white/60">Keywords used</p>
+          <p className="text-xs font-semibold text-white">0 / {keywordLimit}</p>
+        </div>
+        <div className="h-1.5 rounded-full bg-white/[0.08] mb-3 overflow-hidden">
+          <div className="h-full rounded-full bg-[#39ff14] w-0" />
         </div>
         {plan === "free" && (
           <Link
@@ -113,19 +116,19 @@ export function DashboardSidebar() {
       </div>
 
       {/* User */}
-      <div className="px-3 pb-4 border-t border-white/[0.06] pt-3">
+      <div className="px-3 pb-4 border-t border-white/[0.08] pt-3">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-[#39ff14]/20 border border-[#39ff14]/30 flex items-center justify-center flex-shrink-0">
             <span className="text-xs font-bold text-[#39ff14]">{initials}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-white/70 truncate">{user?.email}</p>
-            <p className="text-[10px] text-white/30 capitalize">{plan} plan</p>
+            <p className="text-xs font-semibold text-white/90 truncate">{user?.email}</p>
+            <p className="text-[10px] text-white/50 capitalize">{plan} plan</p>
           </div>
           <button
             onClick={() => logout()}
             title="Sign out"
-            className="text-white/20 hover:text-white/60 transition-colors flex-shrink-0"
+            className="text-white/40 hover:text-white/80 transition-colors flex-shrink-0"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

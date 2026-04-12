@@ -2,9 +2,10 @@
 
 import { ProtectedRoute } from "@/components/protected-route";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
+import { SerpDrawer } from "@/components/serp-drawer";
 import { useAuth } from "@/components/auth-provider";
 import { PLAN_LIMITS } from "@/lib/plans";
-import { KeywordDoc, ProjectDoc } from "@/lib/types";
+import { KeywordDoc, ProjectDoc, SerpResult } from "@/lib/types";
 import {
   addDoc, collection, doc, getCountFromServer, getDocs,
   limit, onSnapshot, orderBy, query,
@@ -96,6 +97,7 @@ export default function ProjectKeywordsPage() {
   const [error, setError] = useState<string | null>(null);
   const [historyMap, setHistoryMap] = useState<Record<string, HistoryPoint[]>>({});
   const [showAddForm, setShowAddForm] = useState(false);
+  const [drawerKeyword, setDrawerKeyword] = useState<KeywordRow | null>(null);
 
   useEffect(() => {
     if (!user || !projectId) return;
@@ -213,7 +215,7 @@ export default function ProjectKeywordsPage() {
                 <button
                   onClick={runAllChecks}
                   disabled={runningAll}
-                  className="flex items-center gap-2 rounded-lg border border-black/[0.07] px-4 py-2 text-sm text-slate-400 hover:border-[#39ff14] hover:text-[#39ff14] transition-all duration-200 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:border-[#39ff14] hover:text-[#39ff14] transition-all duration-200 disabled:opacity-50"
                 >
                   {runningAll ? <Spinner /> : null}
                   {runningAll ? "Running all..." : "Run All Checks"}
@@ -261,7 +263,7 @@ export default function ProjectKeywordsPage() {
             <div className="rounded-xl border border-black/[0.07] bg-white overflow-hidden">
               <div className="px-6 py-4 border-b border-black/[0.07] flex items-center justify-between">
                 <h2 className="font-display text-sm font-normal text-slate-800">Keywords</h2>
-                <span className="text-xs text-slate-400">{keywords.length} keyword{keywords.length !== 1 ? "s" : ""}</span>
+                <span className="text-xs font-medium text-slate-500">{keywords.length} keyword{keywords.length !== 1 ? "s" : ""}</span>
               </div>
 
               {keywords.length === 0 ? (
@@ -277,14 +279,20 @@ export default function ProjectKeywordsPage() {
                   <thead>
                     <tr className="border-b border-black/[0.07]">
                       {["Keyword", "SERP Rank", "Change", "Trend", "AI Citation", "Last Checked", "Actions"].map((h) => (
-                        <th key={h} className="px-5 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-slate-400">{h}</th>
+                        <th key={h} className="px-5 py-3 text-left font-mono text-[10px] uppercase tracking-widest text-slate-500">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {keywords.map((item, i) => (
-                      <tr key={item.id} className={`border-b border-black/[0.07] last:border-0 transition-colors duration-150 hover:bg-[#F5F5F0] ${i % 2 === 1 ? "bg-[#FAFAF7]" : ""}`}>
-                        <td className="px-5 py-4 font-medium text-slate-800 max-w-[200px] truncate">{item.keyword}</td>
+                      <tr
+                        key={item.id}
+                        className={`border-b border-black/[0.07] last:border-0 transition-colors duration-150 hover:bg-[#F5F5F0] cursor-pointer ${i % 2 === 1 ? "bg-[#FAFAF7]" : ""}`}
+                        onClick={() => setDrawerKeyword(item)}
+                      >
+                        <td className="px-5 py-4 font-medium text-slate-800 max-w-[200px] truncate">
+                          <span className="hover:text-[#39ff14] transition-colors">{item.keyword}</span>
+                        </td>
                         <td className="px-5 py-4"><RankBadge rank={item.currentRank} /></td>
                         <td className="px-5 py-4"><ChangeBadge change={item.rankChange} /></td>
                         <td className="px-5 py-4">
@@ -302,13 +310,13 @@ export default function ProjectKeywordsPage() {
                         <td className="px-5 py-4">
                           <AICitationBadge plan={plan} aiCited={item.aiCited} aiReason={item.aiReason} aiCitationStatus={item.aiCitationStatus} />
                         </td>
-                        <td className="px-5 py-4 text-slate-400 text-xs font-mono">{relativeTime(item.lastCheckedAt)}</td>
-                        <td className="px-5 py-4">
+                        <td className="px-5 py-4 text-slate-500 text-xs font-mono">{relativeTime(item.lastCheckedAt)}</td>
+                        <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => runCheck(item.id)}
                               disabled={runningIds.has(item.id) || deletingId === item.id}
-                              className="flex items-center gap-1.5 rounded-lg border border-black/[0.07] px-3 py-1.5 text-xs text-slate-400 hover:border-[#39ff14] hover:text-[#39ff14] transition-all duration-200 disabled:opacity-50"
+                              className="flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-[#39ff14] hover:text-[#39ff14] transition-all duration-200 disabled:opacity-50"
                             >
                               {runningIds.has(item.id) ? <Spinner /> : null}
                               {runningIds.has(item.id) ? "Running..." : "Run Check"}
@@ -316,7 +324,7 @@ export default function ProjectKeywordsPage() {
                             <button
                               onClick={() => deleteKeyword(item.id)}
                               disabled={deletingId === item.id || runningIds.has(item.id)}
-                              className="rounded-lg border border-black/[0.07] p-1.5 text-slate-400 hover:border-[#ff4d6d]/50 hover:text-[#ff4d6d] transition-all duration-200 disabled:opacity-50"
+                              className="rounded-lg border border-slate-300 p-1.5 text-slate-500 hover:border-[#ff4d6d]/60 hover:text-[#ff4d6d] transition-all duration-200 disabled:opacity-50"
                               title="Delete keyword"
                             >
                               {deletingId === item.id ? (
@@ -338,6 +346,14 @@ export default function ProjectKeywordsPage() {
           </main>
         </div>
       </div>
+      <SerpDrawer
+        open={drawerKeyword !== null}
+        onClose={() => setDrawerKeyword(null)}
+        keyword={drawerKeyword?.keyword ?? ""}
+        domain={project?.domain ?? ""}
+        currentRank={drawerKeyword?.currentRank ?? null}
+        results={(drawerKeyword?.serpTopResults ?? []) as SerpResult[]}
+      />
     </ProtectedRoute>
   );
 }

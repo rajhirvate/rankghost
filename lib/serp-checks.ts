@@ -1,4 +1,4 @@
-import { extractRankFromApifyResults } from "@/lib/rank-utils";
+import { extractRankAndResultsFromApifyData, RankCheckResult } from "@/lib/rank-utils";
 
 const APIFY_ACTOR = "apify~google-search-scraper";
 const APIFY_BASE = "https://api.apify.com/v2/acts";
@@ -27,7 +27,7 @@ export async function runSerpRankCheck(
   token: string,
   keyword: string,
   targetDomain: string
-): Promise<number | null> {
+): Promise<RankCheckResult> {
   const data = await runApifyActor(token, {
     queries: keyword,
     maxPagesPerQuery: 10,
@@ -36,5 +36,5 @@ export async function runSerpRankCheck(
     languageCode: "en",
   });
 
-  return extractRankFromApifyResults(data, targetDomain);
+  return extractRankAndResultsFromApifyData(data, targetDomain);
 }

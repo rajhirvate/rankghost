@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const currentRank = await runSerpRankCheck(
+    const { rank: currentRank, topResults: serpTopResults } = await runSerpRankCheck(
       token,
       keywordData.keyword as string,
       projectData.domain as string
@@ -194,6 +194,7 @@ export async function POST(request: NextRequest) {
       previousRank,
       currentRank,
       rankChange,
+      serpTopResults,
       aiCitationStatus:
         plan === "pro"
           ? aiPayload?.aiCitationStatus ?? "not_found"

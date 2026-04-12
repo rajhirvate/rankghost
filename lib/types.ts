@@ -10,6 +10,15 @@ export type ProjectDoc = {
   createdAt: string;
 };
 
+export type SerpResult = {
+  position: number;
+  title: string;
+  url: string;
+  displayUrl: string;
+  snippet: string;
+  isTarget: boolean;
+};
+
 export type KeywordDoc = {
   userId: string;
   keyword: string;
@@ -23,4 +32,5 @@ export type KeywordDoc = {
   aiCheckedAt?: string;
   lastCheckedAt: string | null;
   createdAt: string;
+  serpTopResults?: SerpResult[];
 };
