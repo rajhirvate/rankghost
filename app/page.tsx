@@ -2,6 +2,7 @@
 
 import { FaqAccordion } from "@/components/faq-accordion";
 import { LandingNav } from "@/components/landing-nav";
+import { PayPalSubscribeButton } from "@/components/paypal-subscribe-button";
 import { TiltCard } from "@/components/tilt-card";
 import Link from "next/link";
 import { useState } from "react";
@@ -319,9 +320,14 @@ export default function Home() {
                     ))}
                   </ul>
                   {plan.featured ? (
-                    <button className="font-display w-full rounded-full bg-[#39ff14] py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(57,255,20,0.4)] hover:scale-[1.02] transition-all">
-                      {plan.cta}
-                    </button>
+                    <PayPalSubscribeButton
+                      planId={
+                        isYearly
+                          ? (process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_ANNUAL ?? "")
+                          : (process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY ?? "")
+                      }
+                      label={plan.cta}
+                    />
                   ) : (
                     <button className="w-full rounded-full border border-white/15 py-3 text-sm font-medium text-white hover:bg-white/5 transition-all">
                       {plan.cta}

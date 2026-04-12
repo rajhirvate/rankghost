@@ -4,11 +4,38 @@ import { ProtectedRoute } from "@/components/protected-route";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { useAuth } from "@/components/auth-provider";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SettingsPage() {
   const { user, plan, logout } = useAuth();
+  const router = useRouter();
   const [saved, setSaved] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelMsg, setCancelMsg] = useState<string | null>(null);
+
+  const handleCancelSubscription = async () => {
+    if (!user || !window.confirm("Cancel your Pro subscription? You'll keep Pro until the end of the billing period.")) return;
+    setCancelling(true);
+    setCancelMsg(null);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch("/api/paypal/cancel-subscription", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = (await res.json()) as { error?: string };
+        throw new Error(body.error ?? "Failed to cancel");
+      }
+      setCancelMsg("Subscription cancelled. Your plan will revert to Free.");
+      setTimeout(() => router.refresh(), 2000);
+    } catch (e) {
+      setCancelMsg(e instanceof Error ? e.message : "Something went wrong.");
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   const initials = user?.email?.[0]?.toUpperCase() ?? "U";
 
@@ -102,7 +129,7 @@ export default function SettingsPage() {
                     {plan}
                   </span>
                 </div>
-                {plan === "free" && (
+                {plan === "free" ? (
                   <Link
                     href="/#pricing"
                     className="inline-flex items-center gap-2 rounded-lg bg-[#39ff14] px-5 py-2.5 text-sm font-semibold text-black hover:bg-[#2ecc14] transition-all"
@@ -112,6 +139,19 @@ export default function SettingsPage() {
                     </svg>
                     Upgrade to Pro
                   </Link>
+                ) : (
+                  <div className="space-y-2">
+                    {cancelMsg && (
+                      <p className={`text-sm ${cancelMsg.includes("cancelled") ? "text-[#39ff14]" : "text-red-500"}`}>{cancelMsg}</p>
+                    )}
+                    <button
+                      onClick={handleCancelSubscription}
+                      disabled={cancelling}
+                      className="rounded-lg border border-red-100 px-5 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-all disabled:opacity-50"
+                    >
+                      {cancelling ? "Cancelling…" : "Cancel Subscription"}
+                    </button>
+                  </div>
                 )}
               </div>
             </section>
