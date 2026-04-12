@@ -138,6 +138,51 @@ export function DashboardSidebar() {
         )}
       </div>
 
+      {/* Usage stats */}
+      <div className="mx-3 mb-3 rounded-xl bg-white/[0.03] border border-white/[0.06] divide-y divide-white/[0.05]">
+        {[
+          {
+            label: "Check Frequency",
+            value: "24h / keyword",
+            icon: (
+              <svg className="h-3 w-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ),
+          },
+          {
+            label: "AI Citations",
+            value: plan === "pro" ? "Unlocked" : "Pro only",
+            icon: (
+              <svg className={`h-3 w-3 ${plan === "pro" ? "text-[#39ff14]" : "text-white/30"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                {plan === "pro"
+                  ? <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  : <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />}
+              </svg>
+            ),
+          },
+          {
+            label: "SERP Depth",
+            value: "Top 100 results",
+            icon: (
+              <svg className="h-3 w-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            ),
+          },
+        ].map((row) => (
+          <div key={row.label} className="flex items-center justify-between px-3 py-2.5">
+            <div className="flex items-center gap-2">
+              {row.icon}
+              <span className="text-[10px] text-white/40">{row.label}</span>
+            </div>
+            <span className={`text-[10px] font-semibold ${row.label === "AI Citations" && plan === "pro" ? "text-[#39ff14]" : "text-white/70"}`}>
+              {row.value}
+            </span>
+          </div>
+        ))}
+      </div>
+
       {/* User */}
       <div className="px-3 pb-4 border-t border-white/[0.08] pt-3">
         <div className="flex items-center gap-3">

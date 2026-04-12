@@ -101,8 +101,93 @@ export default function DashboardPage() {
           </header>
 
           <main className="px-8 py-8">
+            {/* Plan & Usage — top */}
+            {(() => {
+              const limit = PLAN_LIMITS[plan];
+              const kwPct = Math.min((totalKeywords / limit.keywords) * 100, 100);
+              const isPro = plan === "pro";
+              return (
+                <div className="mb-6 rounded-xl border border-black/[0.07] bg-white overflow-hidden">
+                  <div className="px-6 py-4 border-b border-black/[0.07] flex items-center justify-between">
+                    <h2 className="font-display text-sm font-normal text-slate-800">Plan &amp; Usage</h2>
+                    <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${isPro ? "bg-[#39ff14]/10 text-[#39ff14] border border-[#39ff14]/20" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
+                      {plan} plan
+                    </span>
+                  </div>
+
+                  <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Keywords */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-500">Keywords</span>
+                        <span className="text-xs font-bold text-slate-800">{totalKeywords} / {limit.keywords}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#39ff14] transition-all duration-700" style={{ width: `${kwPct}%` }} />
+                      </div>
+                      <p className="text-[11px] text-slate-400">{limit.keywords - totalKeywords} remaining</p>
+                    </div>
+
+                    {/* Check frequency */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-medium text-slate-500">Check Frequency</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="h-7 w-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                          <svg className="h-3.5 w-3.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">Every 24 hours</p>
+                          <p className="text-[11px] text-slate-400">Per keyword cooldown</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* AI Citation */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-medium text-slate-500">AI Citation Checks</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className={`h-7 w-7 rounded-lg flex items-center justify-center border shrink-0 ${isPro ? "bg-[#39ff14]/10 border-[#39ff14]/20" : "bg-slate-50 border-slate-200"}`}>
+                          <svg className={`h-3.5 w-3.5 ${isPro ? "text-[#39ff14]" : "text-slate-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            {isPro ? <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /> : <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />}
+                          </svg>
+                        </div>
+                        <div>
+                          <p className={`text-sm font-bold ${isPro ? "text-slate-800" : "text-slate-400"}`}>{isPro ? "Unlocked" : "Pro only"}</p>
+                          <p className="text-[11px] text-slate-400">{isPro ? "GPT-4o mini · per check" : "Upgrade to access"}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SERP depth */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-medium text-slate-500">SERP Depth</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="h-7 w-7 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+                          <svg className="h-3.5 w-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">Top 100 results</p>
+                          <p className="text-[11px] text-slate-400">10 pages × 10 results</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {!isPro && (
+                    <div className="mx-6 mb-6 rounded-lg bg-gradient-to-r from-[#39ff14]/10 to-transparent border border-[#39ff14]/20 px-4 py-3 flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">Upgrade to Pro</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Get 60 keywords, AI citations, and bulk parallel checks.</p>
+                      </div>
+                      <Link href="/pricing" className="shrink-0 rounded-lg bg-[#39ff14] px-4 py-2 text-xs font-bold text-black hover:bg-[#2ecc14] transition-all">Upgrade</Link>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {stats.map((s) => (
                 <div key={s.label} className={`rounded-xl border-t-2 ${s.border} bg-white border border-black/[0.07] p-6 py-8 hover:border-[#2a3f5f] transition-all duration-200`}>
                   <p className="font-mono text-[10px] uppercase tracking-widest text-black mb-4">{s.label}</p>
@@ -168,104 +253,6 @@ export default function DashboardPage() {
                 </table>
               )}
             </div>
-            {/* Usage section */}
-            {(() => {
-              const limit = PLAN_LIMITS[plan];
-              const kwPct = Math.min((totalKeywords / limit.keywords) * 100, 100);
-              const isPro = plan === "pro";
-              return (
-                <div className="mt-6 rounded-xl border border-black/[0.07] bg-white overflow-hidden">
-                  <div className="px-6 py-4 border-b border-black/[0.07] flex items-center justify-between">
-                    <h2 className="font-display text-sm font-normal text-slate-800">Plan &amp; Usage</h2>
-                    <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${isPro ? "bg-[#39ff14]/10 text-[#39ff14] border border-[#39ff14]/20" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
-                      {plan} plan
-                    </span>
-                  </div>
-
-                  <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* Keywords */}
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-slate-500">Keywords</span>
-                        <span className="text-xs font-bold text-slate-800">{totalKeywords} / {limit.keywords}</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-[#39ff14] transition-all duration-700"
-                          style={{ width: `${kwPct}%` }}
-                        />
-                      </div>
-                      <p className="text-[11px] text-slate-400">{limit.keywords - totalKeywords} remaining</p>
-                    </div>
-
-                    {/* Check frequency */}
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-xs font-medium text-slate-500">Check Frequency</span>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <div className="h-7 w-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
-                          <svg className="h-3.5 w-3.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-800">Every 24 hours</p>
-                          <p className="text-[11px] text-slate-400">Per keyword cooldown</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* AI Citation */}
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-xs font-medium text-slate-500">AI Citation Checks</span>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <div className={`h-7 w-7 rounded-lg flex items-center justify-center border ${isPro ? "bg-[#39ff14]/10 border-[#39ff14]/20" : "bg-slate-50 border-slate-200"}`}>
-                          <svg className={`h-3.5 w-3.5 ${isPro ? "text-[#39ff14]" : "text-slate-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            {isPro
-                              ? <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              : <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            }
-                          </svg>
-                        </div>
-                        <div>
-                          <p className={`text-sm font-bold ${isPro ? "text-slate-800" : "text-slate-400"}`}>
-                            {isPro ? "Unlocked" : "Pro only"}
-                          </p>
-                          <p className="text-[11px] text-slate-400">{isPro ? "GPT-4o mini · per check" : "Upgrade to access"}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* SERP depth */}
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-xs font-medium text-slate-500">SERP Depth</span>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <div className="h-7 w-7 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center">
-                          <svg className="h-3.5 w-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-800">Top 100 results</p>
-                          <p className="text-[11px] text-slate-400">10 pages × 10 results</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {!isPro && (
-                    <div className="mx-6 mb-6 rounded-lg bg-gradient-to-r from-[#39ff14]/10 to-transparent border border-[#39ff14]/20 px-4 py-3 flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-800">Upgrade to Pro</p>
-                        <p className="text-xs text-slate-500 mt-0.5">Get 60 keywords, AI citations, and bulk parallel checks.</p>
-                      </div>
-                      <Link href="/pricing" className="shrink-0 rounded-lg bg-[#39ff14] px-4 py-2 text-xs font-bold text-black hover:bg-[#2ecc14] transition-all">
-                        Upgrade
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
           </main>
         </div>
       </div>
