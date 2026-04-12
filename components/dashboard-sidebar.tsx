@@ -127,7 +127,7 @@ export function DashboardSidebar() {
         </div>
         {plan === "free" && (
           <Link
-            href="/pricing"
+            href="/#pricing"
             className="flex items-center justify-center gap-2 w-full rounded-lg bg-[#39ff14]/10 border border-[#39ff14]/20 py-2 text-xs font-semibold text-[#39ff14] hover:bg-[#39ff14]/20 transition-all"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

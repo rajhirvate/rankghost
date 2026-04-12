@@ -192,7 +192,7 @@ export default function DashboardPage() {
                         <p className="text-sm font-semibold text-slate-800">Upgrade to Pro</p>
                         <p className="text-xs text-slate-500 mt-0.5">Get 60 keywords, AI citations, and bulk parallel checks.</p>
                       </div>
-                      <Link href="/pricing" className="shrink-0 rounded-lg bg-[#39ff14] px-4 py-2 text-xs font-bold text-black hover:bg-[#2ecc14] transition-all">Upgrade</Link>
+                      <Link href="/#pricing" className="shrink-0 rounded-lg bg-[#39ff14] px-4 py-2 text-xs font-bold text-black hover:bg-[#2ecc14] transition-all">Upgrade</Link>
                     </div>
                   )}
                   </div>{/* end accordion body */}
