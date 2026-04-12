@@ -2,15 +2,10 @@
 
 import { FaqAccordion } from "@/components/faq-accordion";
 import { LandingNav } from "@/components/landing-nav";
+import { PayPalSubscribeButton } from "@/components/paypal-subscribe-button";
 import { TiltCard } from "@/components/tilt-card";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
-
-const PayPalSubscribeButton = dynamic(
-  () => import("@/components/paypal-subscribe-button").then((m) => m.PayPalSubscribeButton),
-  { ssr: false, loading: () => <div className="h-[45px] w-full rounded-full bg-white/5 animate-pulse" /> }
-);
 
 /* ─── data ─────────────────────────────────────────────────── */
 
