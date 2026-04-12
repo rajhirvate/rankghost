@@ -23,35 +23,70 @@ function findPayPalSdkScript(): HTMLScriptElement | undefined {
   ) as HTMLScriptElement | undefined;
 }
 
-function loadPayPalSdk(clientId: string): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
-  if (window.paypal) return Promise.resolve();
-
-  const existing = findPayPalSdkScript();
-  if (existing) {
-    return new Promise((resolve, reject) => {
-      if (window.paypal) {
+function waitForPayPal(maxMs: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const tick = () => {
+      if (typeof window !== "undefined" && window.paypal) {
         resolve();
         return;
       }
-      existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener("error", () => reject(new Error("PayPal script failed")), { once: true });
-    });
+      if (Date.now() - start > maxMs) {
+        reject(new Error("PayPal took too long to load. Try refreshing or disabling ad blockers."));
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+}
+
+async function loadPayPalSdk(clientId: string): Promise<void> {
+  if (typeof window === "undefined") return;
+  if (window.paypal) return;
+
+  const id = clientId.trim();
+  if (!id) {
+    throw new Error("PayPal is not configured.");
   }
 
-  return new Promise((resolve, reject) => {
+  const params = new URLSearchParams({
+    "client-id": id,
+    vault: "true",
+    intent: "subscription",
+    currency: "USD",
+    components: "buttons",
+  });
+  const url = `https://www.paypal.com/sdk/js?${params.toString()}`;
+
+  const existing = findPayPalSdkScript();
+  if (existing) {
+    if (window.paypal) return;
+    await waitForPayPal(15000);
+    if (!window.paypal) {
+      throw new Error("PayPal failed to initialize. Check your Client ID or try another browser.");
+    }
+    return;
+  }
+
+  await new Promise<void>((resolve, reject) => {
     const script = document.createElement("script");
-    const params = new URLSearchParams({
-      "client-id": clientId,
-      vault: "true",
-      intent: "subscription",
-    });
-    script.src = `https://www.paypal.com/sdk/js?${params.toString()}`;
+    script.src = url;
     script.async = true;
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Failed to load PayPal SDK"));
-    document.body.appendChild(script);
+    script.onerror = () =>
+      reject(
+        new Error(
+          "Could not load PayPal (blocked or invalid Client ID). Disable ad blockers for this site or contact support."
+        )
+      );
+    document.head.appendChild(script);
   });
+
+  await waitForPayPal(15000);
+  if (!window.paypal) {
+    throw new Error("PayPal SDK loaded but did not initialize. Your Client ID may be invalid for this environment.");
+  }
 }
 
 export function PayPalSubscribeButton({ planId, label = "Subscribe" }: Props) {
@@ -64,20 +99,21 @@ export function PayPalSubscribeButton({ planId, label = "Subscribe" }: Props) {
   useEffect(() => {
     if (!planId || plan === "pro" || !user || !containerRef.current) return;
 
-    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-    if (!clientId) {
-      setError("PayPal is not configured.");
-      return;
-    }
-
     const el = containerRef.current;
     let destroyed = false;
 
     const run = async () => {
       setError(null);
       try {
-        await loadPayPalSdk(clientId);
+        const cfgRes = await fetch("/api/paypal/public-config");
+        const cfg = (await cfgRes.json()) as { clientId?: string; error?: string };
+        if (!cfgRes.ok || !cfg.clientId) {
+          throw new Error(cfg.error ?? "PayPal is not configured on the server.");
+        }
+
+        await loadPayPalSdk(cfg.clientId);
         if (destroyed || !el.isConnected) return;
+
         const paypal = window.paypal;
         if (!paypal) {
           setError("PayPal failed to initialize.");
