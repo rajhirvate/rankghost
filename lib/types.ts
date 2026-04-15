@@ -1,4 +1,4 @@
-export type PlanTier = "free" | "pro";
+export type PlanTier = "free" | "starter" | "pro" | "agency";
 
 export type UserPlan = {
   plan: PlanTier;

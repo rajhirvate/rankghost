@@ -27,6 +27,7 @@ export default function DashboardPage() {
   const [averageRank, setAverageRank] = useState<number | null>(null);
   const [projectAvgRanks, setProjectAvgRanks] = useState<Record<string, number | null>>({});
   const [projectKeywordCounts, setProjectKeywordCounts] = useState<Record<string, number>>({});
+  const [projectLastChecked, setProjectLastChecked] = useState<Record<string, string | null>>({});
   const [usageOpen, setUsageOpen] = useState(true);
 
   useEffect(() => {
@@ -54,23 +55,29 @@ export default function DashboardPage() {
       let total = 0, ranked = 0, rankSum = 0;
       const avgRanks: Record<string, number | null> = {};
       const kwCounts: Record<string, number> = {};
+      const lastChecked: Record<string, string | null> = {};
 
       for (const project of projects) {
         const snap = await getDocs(collection(db, "users", user.uid, "projects", project.id, "keywords"));
-        let pRanked = 0, pSum = 0;
+        let pRanked = 0, pSum = 0, latestCheck: string | null = null;
         snap.docs.forEach((d) => {
           const row = d.data() as KeywordDoc;
           total += 1;
           if (typeof row.currentRank === "number") { ranked += 1; rankSum += row.currentRank; pRanked += 1; pSum += row.currentRank; }
+          if (row.lastCheckedAt && (!latestCheck || row.lastCheckedAt > latestCheck)) {
+            latestCheck = row.lastCheckedAt;
+          }
         });
         kwCounts[project.id] = snap.docs.length;
         avgRanks[project.id] = pRanked > 0 ? Number((pSum / pRanked).toFixed(1)) : null;
+        lastChecked[project.id] = latestCheck;
       }
       setTotalKeywords(total);
       setRankedKeywords(ranked);
       setAverageRank(ranked > 0 ? Number((rankSum / ranked).toFixed(1)) : null);
       setProjectAvgRanks(avgRanks);
       setProjectKeywordCounts(kwCounts);
+      setProjectLastChecked(lastChecked);
     };
     loadMetrics().catch(console.error);
   }, [projects, user]);
@@ -106,7 +113,9 @@ export default function DashboardPage() {
             {(() => {
               const limit = PLAN_LIMITS[plan];
               const kwPct = Math.min((totalKeywords / limit.keywords) * 100, 100);
-              const isPro = plan === "pro";
+              const isPaid = plan === "starter" || plan === "pro" || plan === "agency";
+              const hasAiCitations = plan === "starter" || plan === "pro" || plan === "agency";
+              const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
               return (
                 <div className="mb-6 rounded-xl border border-black/[0.07] bg-white overflow-hidden">
                   <button
@@ -115,8 +124,8 @@ export default function DashboardPage() {
                   >
                     <div className="flex items-center gap-3">
                       <h2 className="font-display text-sm font-normal text-slate-800">Plan &amp; Usage</h2>
-                      <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${isPro ? "bg-[#39ff14] text-black" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
-                        {isPro ? "Pro" : "Free"}
+                      <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${isPaid ? "bg-[#39ff14] text-black" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
+                        {planLabel}
                       </span>
                     </div>
                     <svg
@@ -159,14 +168,14 @@ export default function DashboardPage() {
                     <div className="flex flex-col gap-1.5">
                       <span className="text-xs font-medium text-slate-500">AI Citation Checks</span>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <div className={`h-7 w-7 rounded-lg flex items-center justify-center border shrink-0 ${isPro ? "bg-[#39ff14]/10 border-[#39ff14]/20" : "bg-slate-50 border-slate-200"}`}>
-                          <svg className={`h-3.5 w-3.5 ${isPro ? "text-[#39ff14]" : "text-slate-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            {isPro ? <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /> : <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />}
+                        <div className={`h-7 w-7 rounded-lg flex items-center justify-center border shrink-0 ${hasAiCitations ? "bg-[#39ff14]/10 border-[#39ff14]/20" : "bg-slate-50 border-slate-200"}`}>
+                          <svg className={`h-3.5 w-3.5 ${hasAiCitations ? "text-[#39ff14]" : "text-slate-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            {hasAiCitations ? <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /> : <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />}
                           </svg>
                         </div>
                         <div>
-                          <p className={`text-sm font-bold ${isPro ? "text-slate-800" : "text-slate-400"}`}>{isPro ? "Unlocked" : "Pro only"}</p>
-                          <p className="text-[11px] text-slate-400">{isPro ? "GPT-4o mini · per check" : "Upgrade to access"}</p>
+                          <p className={`text-sm font-bold ${hasAiCitations ? "text-slate-800" : "text-slate-400"}`}>{hasAiCitations ? "Unlocked" : "Starter+"}</p>
+                          <p className="text-[11px] text-slate-400">{hasAiCitations ? "GPT-4o mini · per check" : "Upgrade to access"}</p>
                         </div>
                       </div>
                     </div>
@@ -186,11 +195,11 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {!isPro && (
+                  {plan === "free" && (
                     <div className="mx-6 mb-6 rounded-lg bg-gradient-to-r from-[#39ff14]/10 to-transparent border border-[#39ff14]/20 px-4 py-3 flex items-center justify-between gap-4">
                       <div>
-                        <p className="text-sm font-semibold text-slate-800">Upgrade to Pro</p>
-                        <p className="text-xs text-slate-500 mt-0.5">Get 60 keywords, AI citations, and bulk parallel checks.</p>
+                        <p className="text-sm font-semibold text-slate-800">Upgrade to Starter</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Get 100 keywords, daily checks, and AI citation monitoring.</p>
                       </div>
                       <Link href="/#pricing" className="shrink-0 rounded-lg bg-[#39ff14] px-4 py-2 text-xs font-bold text-black hover:bg-[#2ecc14] transition-all">Upgrade</Link>
                     </div>
@@ -251,7 +260,7 @@ export default function DashboardPage() {
                           <td className="px-6 py-4 text-slate-400 font-mono text-xs">{item.domain}</td>
                           <td className="px-6 py-4 text-slate-400">{projectKeywordCounts[item.id] ?? 0}</td>
                           <td className="px-6 py-4 text-slate-800">{avg !== null ? `#${avg}` : "—"}</td>
-                          <td className="px-6 py-4 text-slate-400 text-xs">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "—"}</td>
+                          <td className="px-6 py-4 text-slate-400 text-xs">{projectLastChecked[item.id] ? new Date(projectLastChecked[item.id]!).toLocaleDateString() : "Never"}</td>
                           <td className="px-6 py-4">
                             <Link
                               href={`/dashboard/projects/${item.id}`}

@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     const nowIso = new Date().toISOString();
     let aiPayload: AiCitationPayload | null = null;
 
-    if (plan === "pro") {
+    if (plan === "starter" || plan === "pro" || plan === "agency") {
       try {
         const openAiKey = process.env.OPENAI_API_KEY;
         if (!openAiKey) {
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
       rankChange,
       serpTopResults,
       aiCitationStatus:
-        plan === "pro"
+        (plan === "starter" || plan === "pro" || plan === "agency")
           ? aiPayload?.aiCitationStatus ?? "not_found"
           : "locked",
       lastCheckedAt: nowIso,

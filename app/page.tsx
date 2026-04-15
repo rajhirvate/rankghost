@@ -23,34 +23,34 @@ const objections = [
   { q: "Is the rank data actually live?", a: "Yes. Every check hits Apify's Google Search Scraper in real-time and returns fresh SERP data — not cached results." },
   { q: "What if my site isn't in the top 100?", a: "We scan 10 pages × 10 results = 100 positions. If you're not found, we return 'Not found' so you know exactly where you stand." },
   { q: "Do I need to know how to code?", a: "Not at all. RankGhost is a no-code dashboard. Create a project, add keywords, click Run Check." },
-  { q: "Is the free plan actually useful?", a: "Yes — 5 keywords, full SERP tracking, rank history charts. No credit card. It's a real product, not a teaser." },
+  { q: "Is the free plan actually useful?", a: "Yes — 10 keywords, weekly SERP tracking, rank history charts. No credit card required. It's a real product, not a teaser." },
 ];
 
 const plans = [
   {
     label: "For Freelancers & Solos",
     name: "Starter",
-    monthly: { price: "13", cents: ".99", note: "Billed monthly · No commitment" },
-    yearly:  { price: "9",  cents: ".99", note: "Billed annually · Save $48/yr" },
-    features: ["5 keywords", "SERP rank tracking (top 100)", "Rank history charts", "Daily updates"],
+    monthly: { price: "9",  cents: ".99", note: "Billed monthly · No commitment" },
+    yearly:  { price: "7",  cents: ".99", note: "Billed annually · Save $24/yr" },
+    features: ["100 keywords", "Daily SERP rank tracking (top 100)", "AI citation monitoring", "Rank history charts"],
     cta: "Get Started",
     featured: false,
   },
   {
     label: "For Growing Teams",
     name: "Pro",
-    monthly: { price: "34", cents: ".99", note: "Billed monthly · No commitment" },
-    yearly:  { price: "24", cents: ".99", note: "Billed annually · Save $120/yr" },
-    features: ["60 keywords", "SERP rank tracking (top 100)", "AI citation monitoring", "Bulk parallel checks", "Multi-project dashboard", "Priority support"],
+    monthly: { price: "24", cents: ".99", note: "Billed monthly · No commitment" },
+    yearly:  { price: "19", cents: ".99", note: "Billed annually · Save $60/yr" },
+    features: ["500 keywords", "Daily SERP rank tracking (top 100)", "AI citation monitoring", "Bulk parallel checks", "Multi-project dashboard", "Priority support"],
     cta: "Start a Free Trial",
     featured: true,
   },
   {
     label: "For Agencies",
     name: "Agency",
-    monthly: { price: "99", cents: ".99", note: "Billed monthly · No commitment" },
-    yearly:  { price: "69", cents: ".99", note: "Billed annually · Save $360/yr" },
-    features: ["Unlimited keywords", "Everything in Pro", "White-label reports", "Custom API access", "Dedicated account manager"],
+    monthly: { price: "69", cents: ".99", note: "Billed monthly · No commitment" },
+    yearly:  { price: "55", cents: ".99", note: "Billed annually · Save $168/yr" },
+    features: ["2,000 keywords", "Everything in Pro", "White-label reports", "Dedicated account manager"],
     cta: "Contact Sales",
     featured: false,
   },
@@ -219,7 +219,7 @@ export default function Home() {
       </section>
 
       {/* ══ FEATURES BENTO ═════════════════════════════════════════ */}
-      <section id="features" className="pt-12 pb-24 sm:pb-32 relative bg-white">
+      <section id="features" className="pt-12 pb-10 relative bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
             <div className="max-w-xl text-left">
@@ -254,7 +254,7 @@ export default function Home() {
       </section>
 
       {/* ══ PRICING ═══════════════════════════════════════════════ */}
-      <section id="pricing" className="py-24 sm:py-32 relative bg-[#050505]">
+      <section id="pricing" className="pt-14 pb-6 relative bg-[#050505]">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-[#39ff14]/5 rounded-full blur-[140px] pointer-events-none" />
 
         <div className="mx-auto max-w-5xl px-4 sm:px-6 relative z-10">
@@ -278,7 +278,7 @@ export default function Home() {
                 <span className="bg-[#39ff14] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">Save 25%</span>
               </button>
             </div>
-            <div className="block">
+            <div>
               <button className="text-xs text-slate-500 hover:text-[#39ff14] transition-colors underline underline-offset-2">Have a coupon? Redeem here</button>
             </div>
           </div>
@@ -336,6 +336,30 @@ export default function Home() {
                 </div>
               );
             })}
+          </div>
+
+          {/* ── Free plan ─────────────────────────────────────────── */}
+          <div className="mt-5 rounded-[20px] border border-white/[0.06] bg-white/[0.02] px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-8">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs text-slate-500 uppercase tracking-widest">Free</span>
+                <span className="text-[10px] bg-white/10 text-slate-400 px-2 py-0.5 rounded-full font-medium">No credit card</span>
+              </div>
+              <p className="text-white font-display text-lg font-normal leading-snug mb-2">Start tracking for free</p>
+              <ul className="flex flex-wrap gap-x-5 gap-y-1">
+                {["10 keywords", "Weekly SERP rank tracking", "Rank history charts"].map(f => (
+                  <li key={f} className="flex items-center gap-1.5 text-xs text-slate-500">
+                    <span className="text-[#39ff14]/70">✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Link
+              href="/signup"
+              className="shrink-0 rounded-full border border-white/15 px-6 py-2.5 text-sm font-medium text-white hover:bg-white/5 transition-all whitespace-nowrap"
+            >
+              Get started free
+            </Link>
           </div>
         </div>
       </section>

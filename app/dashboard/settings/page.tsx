@@ -118,18 +118,21 @@ export default function SettingsPage() {
                   <div>
                     <p className="font-medium text-slate-800 capitalize">{plan} Plan</p>
                     <p className="text-sm text-slate-400">
-                      {plan === "free" ? "5 keywords · No AI citations" : "60 keywords · AI citations included"}
+                      {plan === "free" ? "10 keywords · Weekly checks · No AI citations"
+                        : plan === "starter" ? "100 keywords · Daily checks · AI citations included"
+                        : plan === "pro" ? "500 keywords · Daily checks · AI citations included"
+                        : "2,000 keywords · Daily checks · AI citations included"}
                     </p>
                   </div>
                   <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
-                    plan === "pro"
+                    plan !== "free"
                       ? "bg-[#39ff14]/10 text-[#39ff14] border border-[#39ff14]/20"
                       : "bg-slate-100 text-slate-500 border border-slate-200"
                   }`}>
                     {plan}
                   </span>
                 </div>
-                {plan === "free" ? (
+                {plan === "free" || plan === "starter" ? (
                   <Link
                     href="/#pricing"
                     className="inline-flex items-center gap-2 rounded-lg bg-[#39ff14] px-5 py-2.5 text-sm font-semibold text-black hover:bg-[#2ecc14] transition-all"
@@ -137,7 +140,7 @@ export default function SettingsPage() {
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                     </svg>
-                    Upgrade to Pro
+                    Upgrade Plan
                   </Link>
                 ) : (
                   <div className="space-y-2">
@@ -151,6 +154,7 @@ export default function SettingsPage() {
                     >
                       {cancelling ? "Cancelling…" : "Cancel Subscription"}
                     </button>
+                    <p className="text-xs text-slate-400">Want to switch plans? Cancel here, then resubscribe on the <Link href="/#pricing" className="underline underline-offset-2 hover:text-slate-600 transition-colors">pricing page</Link>.</p>
                   </div>
                 )}
               </div>
