@@ -30,8 +30,9 @@ const plans = [
   {
     label: "For Freelancers & Solos",
     name: "Starter",
-    monthly: { price: "9",  cents: ".99", note: "Billed monthly · No commitment" },
-    yearly:  { price: "7",  cents: ".99", note: "Billed annually · Save $24/yr" },
+    tier: "starter",
+    monthly: { price: "9",  cents: ".99", note: "Billed monthly · No commitment",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY ?? "" },
+    yearly:  { price: "7",  cents: ".99", note: "Billed annually · Save $24/yr",     planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL  ?? "" },
     features: ["100 keywords", "Daily SERP rank tracking (top 100)", "AI citation monitoring", "Rank history charts"],
     cta: "Get Started",
     featured: false,
@@ -39,19 +40,21 @@ const plans = [
   {
     label: "For Growing Teams",
     name: "Pro",
-    monthly: { price: "24", cents: ".99", note: "Billed monthly · No commitment" },
-    yearly:  { price: "19", cents: ".99", note: "Billed annually · Save $60/yr" },
+    tier: "pro",
+    monthly: { price: "24", cents: ".99", note: "Billed monthly · No commitment",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO_MONTHLY ?? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY ?? "" },
+    yearly:  { price: "19", cents: ".99", note: "Billed annually · Save $60/yr",     planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO_ANNUAL  ?? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_ANNUAL  ?? "" },
     features: ["500 keywords", "Daily SERP rank tracking (top 100)", "AI citation monitoring", "Bulk parallel checks", "Multi-project dashboard", "Priority support"],
-    cta: "Start a Free Trial",
+    cta: "Get Started",
     featured: true,
   },
   {
     label: "For Agencies",
     name: "Agency",
-    monthly: { price: "69", cents: ".99", note: "Billed monthly · No commitment" },
-    yearly:  { price: "55", cents: ".99", note: "Billed annually · Save $168/yr" },
+    tier: "agency",
+    monthly: { price: "69", cents: ".99", note: "Billed monthly · No commitment",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY ?? "" },
+    yearly:  { price: "55", cents: ".99", note: "Billed annually · Save $168/yr",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL  ?? "" },
     features: ["2,000 keywords", "Everything in Pro", "White-label reports", "Dedicated account manager"],
-    cta: "Contact Sales",
+    cta: "Get Started",
     featured: false,
   },
 ];
@@ -103,7 +106,7 @@ export default function Home() {
               href="/signup"
               className="font-display inline-block w-full sm:w-auto rounded-full bg-[#39ff14] px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_24px_rgba(57,255,20,0.4)] transition-all hover:scale-105 active:scale-95 text-center"
             >
-              Start a Free Trial
+              Get Started Free
             </Link>
             <Link
               href="/login"
@@ -319,20 +322,11 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  {plan.featured ? (
-                    <PayPalSubscribeButton
-                      planId={
-                        isYearly
-                          ? (process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_ANNUAL ?? "")
-                          : (process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY ?? "")
-                      }
-                      label={plan.cta}
-                    />
-                  ) : (
-                    <button className="w-full rounded-full border border-white/15 py-3 text-sm font-medium text-white hover:bg-white/5 transition-all">
-                      {plan.cta}
-                    </button>
-                  )}
+                  <PayPalSubscribeButton
+                    planId={isYearly ? plan.yearly.planId : plan.monthly.planId}
+                    targetPlan={plan.tier}
+                    label={plan.cta}
+                  />
                 </div>
               );
             })}

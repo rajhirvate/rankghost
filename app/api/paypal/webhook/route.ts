@@ -1,12 +1,20 @@
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
 import { getPayPalAccessToken, PAYPAL_API } from "@/lib/paypal";
+import { PlanTier } from "@/lib/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
 
+function tierFromPlanId(planId: string): PlanTier {
+  const e = process.env;
+  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL) return "starter";
+  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY  || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL)  return "agency";
+  return "pro"; // Pro plan IDs (including legacy NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY/ANNUAL)
+}
+
 async function verifySignature(req: NextRequest, body: string): Promise<boolean> {
   const webhookId = process.env.PAYPAL_WEBHOOK_ID;
-  if (!webhookId) return true; // skip verification until webhook ID is configured
+  if (!webhookId) return true;
 
   try {
     const token = await getPayPalAccessToken();
@@ -60,11 +68,13 @@ export async function POST(req: NextRequest) {
         const email = subscriber?.email_address;
         if (!email) break;
 
+        const tier = tierFromPlanId(planId);
+
         try {
           const userRecord = await adminAuth.getUserByEmail(email);
           await adminDb.collection("users").doc(userRecord.uid).set(
             {
-              plan: "pro",
+              plan: tier,
               paypalSubscriptionId: subscriptionId,
               paypalPlanId: planId,
               subscriptionStatus: "active",
@@ -72,7 +82,7 @@ export async function POST(req: NextRequest) {
             },
             { merge: true }
           );
-          console.log(`[webhook] activated pro for uid=${userRecord.uid}`);
+          console.log(`[webhook] activated ${tier} for uid=${userRecord.uid}`);
         } catch (e) {
           console.error("[webhook] user not found for email:", email, e);
         }
@@ -90,8 +100,7 @@ export async function POST(req: NextRequest) {
           .get();
 
         if (!snap.empty) {
-          const status =
-            eventType === "BILLING.SUBSCRIPTION.CANCELLED" ? "cancelled" : "expired";
+          const status = eventType === "BILLING.SUBSCRIPTION.CANCELLED" ? "cancelled" : "expired";
           await snap.docs[0].ref.update({
             plan: "free",
             subscriptionStatus: status,

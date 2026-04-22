@@ -4,8 +4,11 @@ import { useAuth } from "@/components/auth-provider";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+const PLAN_RANK: Record<string, number> = { free: 0, starter: 1, pro: 2, agency: 3 };
+
 type Props = {
   planId: string;
+  targetPlan: string; // "starter" | "pro" | "agency"
   label?: string;
 };
 
@@ -17,20 +20,15 @@ declare global {
   }
 }
 
-function findPayPalSdkScript(): HTMLScriptElement | undefined {
-  return Array.from(document.querySelectorAll("script")).find((s) =>
-    s.src.includes("paypal.com/sdk/js")
-  ) as HTMLScriptElement | undefined;
-}
+// Module-level mutex: all 3 plan buttons share this promise so the SDK is
+// only injected once even when they all mount at the same time.
+let sdkLoadPromise: Promise<void> | null = null;
 
 function waitForPayPal(maxMs: number): Promise<void> {
   return new Promise((resolve, reject) => {
     const start = Date.now();
     const tick = () => {
-      if (typeof window !== "undefined" && window.paypal) {
-        resolve();
-        return;
-      }
+      if (typeof window !== "undefined" && window.paypal) { resolve(); return; }
       if (Date.now() - start > maxMs) {
         reject(new Error("PayPal took too long to load. Try refreshing or disabling ad blockers."));
         return;
@@ -41,63 +39,56 @@ function waitForPayPal(maxMs: number): Promise<void> {
   });
 }
 
-async function loadPayPalSdk(clientId: string): Promise<void> {
-  if (typeof window === "undefined") return;
-  if (window.paypal) return;
+function loadPayPalSdk(clientId: string): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (window.paypal) return Promise.resolve();
 
-  const id = clientId.trim();
-  if (!id) {
-    throw new Error("PayPal is not configured.");
+  if (!sdkLoadPromise) {
+    sdkLoadPromise = (async () => {
+      const id = clientId.trim();
+      if (!id) throw new Error("PayPal is not configured.");
+
+      const params = new URLSearchParams({
+        "client-id": id,
+        vault: "true",
+        intent: "subscription",
+        currency: "USD",
+        components: "buttons",
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = `https://www.paypal.com/sdk/js?${params.toString()}`;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () =>
+          reject(new Error("Could not load PayPal (blocked or invalid Client ID). Disable ad blockers for this site or contact support."));
+        document.head.appendChild(script);
+      });
+
+      await waitForPayPal(15000);
+      if (!window.paypal) {
+        throw new Error("PayPal SDK loaded but did not initialize. Your Client ID may be invalid for this environment.");
+      }
+    })();
   }
 
-  const params = new URLSearchParams({
-    "client-id": id,
-    vault: "true",
-    intent: "subscription",
-    currency: "USD",
-    components: "buttons",
-  });
-  const url = `https://www.paypal.com/sdk/js?${params.toString()}`;
-
-  const existing = findPayPalSdkScript();
-  if (existing) {
-    if (window.paypal) return;
-    await waitForPayPal(15000);
-    if (!window.paypal) {
-      throw new Error("PayPal failed to initialize. Check your Client ID or try another browser.");
-    }
-    return;
-  }
-
-  await new Promise<void>((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = url;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () =>
-      reject(
-        new Error(
-          "Could not load PayPal (blocked or invalid Client ID). Disable ad blockers for this site or contact support."
-        )
-      );
-    document.head.appendChild(script);
-  });
-
-  await waitForPayPal(15000);
-  if (!window.paypal) {
-    throw new Error("PayPal SDK loaded but did not initialize. Your Client ID may be invalid for this environment.");
-  }
+  return sdkLoadPromise;
 }
 
-export function PayPalSubscribeButton({ planId, label = "Subscribe" }: Props) {
+export function PayPalSubscribeButton({ planId, targetPlan, label = "Subscribe" }: Props) {
   const { user, plan } = useAuth();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const currentRank = PLAN_RANK[plan] ?? 0;
+  const targetRank  = PLAN_RANK[targetPlan] ?? 0;
+  const alreadyOnPlan = currentRank >= targetRank && plan !== "free";
+
   useEffect(() => {
-    if (!planId || plan === "pro" || !user || !containerRef.current) return;
+    if (!planId || alreadyOnPlan || !user || !containerRef.current) return;
 
     const el = containerRef.current;
     let destroyed = false;
@@ -171,17 +162,19 @@ export function PayPalSubscribeButton({ planId, label = "Subscribe" }: Props) {
       destroyed = true;
       el.innerHTML = "";
     };
-  }, [planId, plan, user, router]);
+  }, [planId, alreadyOnPlan, user, router]);
 
-  if (!planId) return null;
-
-  if (plan === "pro") {
+  if (alreadyOnPlan) {
+    const onExactPlan = plan === targetPlan;
+    const displayPlan = plan.charAt(0).toUpperCase() + plan.slice(1);
     return (
       <div className="w-full rounded-full border border-[#39ff14]/40 py-3 text-sm font-bold text-[#39ff14] text-center">
-        ✓ You&apos;re on Pro
+        {onExactPlan ? `✓ You're on ${displayPlan}` : `✓ Included in your ${displayPlan} plan`}
       </div>
     );
   }
+
+  if (!planId) return null;
 
   if (!user) {
     return (
@@ -194,11 +187,13 @@ export function PayPalSubscribeButton({ planId, label = "Subscribe" }: Props) {
     );
   }
 
+  const displayTarget = targetPlan.charAt(0).toUpperCase() + targetPlan.slice(1);
+
   return (
     <div className="w-full">
       {error && <p className="text-red-400 text-xs text-center mb-2">{error}</p>}
       {verifying && (
-        <p className="text-[#39ff14] text-xs text-center mb-2 animate-pulse">Activating your Pro plan…</p>
+        <p className="text-[#39ff14] text-xs text-center mb-2 animate-pulse">Activating your {displayTarget} plan…</p>
       )}
       <div ref={containerRef} className="w-full min-h-[45px]" />
     </div>

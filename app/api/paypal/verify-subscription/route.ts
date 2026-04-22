@@ -1,6 +1,16 @@
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
 import { getSubscription } from "@/lib/paypal";
+import { PlanTier } from "@/lib/types";
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 60;
+
+function tierFromPlanId(planId: string): PlanTier {
+  const e = process.env;
+  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL) return "starter";
+  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY  || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL)  return "agency";
+  return "pro";
+}
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -22,16 +32,20 @@ export async function POST(req: NextRequest) {
 
   const subscription = await getSubscription(subscriptionId);
 
-  if (subscription.status !== "ACTIVE") {
+  // APPROVED = user just approved in PayPal UI; ACTIVE = payment processed.
+  // onApprove fires at APPROVED; ACTIVE arrives via webhook shortly after.
+  if (!["ACTIVE", "APPROVED"].includes(subscription.status)) {
     return NextResponse.json(
       { error: `Subscription status is ${subscription.status}` },
       { status: 400 }
     );
   }
 
+  const tier = tierFromPlanId(subscription.plan_id);
+
   await adminDb.collection("users").doc(userId).set(
     {
-      plan: "pro",
+      plan: tier,
       paypalSubscriptionId: subscriptionId,
       paypalPlanId: subscription.plan_id,
       subscriptionStatus: "active",

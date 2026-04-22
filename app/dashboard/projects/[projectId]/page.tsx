@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { getClientDb } from "@/lib/firebase";
 import { Line, LineChart, ResponsiveContainer, YAxis } from "recharts";
 
@@ -98,6 +98,18 @@ export default function ProjectKeywordsPage() {
   const [historyMap, setHistoryMap] = useState<Record<string, HistoryPoint[]>>({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [drawerKeyword, setDrawerKeyword] = useState<KeywordRow | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   useEffect(() => {
     if (!user || !projectId) return;
@@ -194,6 +206,65 @@ export default function ProjectKeywordsPage() {
     } finally { setDeletingId(null); }
   };
 
+  const exportCSV = () => {
+    const rows = [
+      ["Keyword", "SERP Rank", "Change", "AI Citation", "Last Checked"],
+      ...keywords.map((k) => [
+        k.keyword,
+        k.currentRank != null ? `#${k.currentRank}` : "Not found",
+        typeof k.rankChange === "number" ? (k.rankChange > 0 ? `▼${k.rankChange}` : k.rankChange < 0 ? `▲${Math.abs(k.rankChange)}` : "—") : "—",
+        plan === "free" ? "Locked" : typeof k.aiCited === "boolean" ? (k.aiCited ? "Cited" : "Not cited") : (k.aiCitationStatus ?? "—"),
+        k.lastCheckedAt ? new Date(k.lastCheckedAt).toLocaleString() : "Never",
+      ]),
+    ];
+    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${project?.name ?? "report"}-keywords.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  };
+
+  const exportPDF = async () => {
+    const { jsPDF } = await import("jspdf");
+    const autoTable = (await import("jspdf-autotable")).default;
+    const pdf = new jsPDF({ orientation: "landscape" });
+
+    pdf.setFontSize(18);
+    pdf.setTextColor(30, 45, 69);
+    pdf.text(project?.name ?? "Project Report", 14, 18);
+    if (project?.domain) {
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 116, 139);
+      pdf.text(project.domain, 14, 25);
+    }
+    pdf.setFontSize(9);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(`Generated ${new Date().toLocaleString()}`, 14, 31);
+
+    autoTable(pdf, {
+      startY: 37,
+      head: [["Keyword", "SERP Rank", "Change", "AI Citation", "Last Checked"]],
+      body: keywords.map((k) => [
+        k.keyword,
+        k.currentRank != null ? `#${k.currentRank}` : "Not found",
+        typeof k.rankChange === "number" ? (k.rankChange > 0 ? `▼${k.rankChange}` : k.rankChange < 0 ? `▲${Math.abs(k.rankChange)}` : "—") : "—",
+        plan === "free" ? "Locked" : typeof k.aiCited === "boolean" ? (k.aiCited ? "Cited ✓" : "Not cited") : (k.aiCitationStatus ?? "—"),
+        k.lastCheckedAt ? new Date(k.lastCheckedAt).toLocaleString() : "Never",
+      ]),
+      headStyles: { fillColor: [30, 45, 69], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 9 },
+      bodyStyles: { fontSize: 9, textColor: [51, 65, 85] },
+      alternateRowStyles: { fillColor: [245, 245, 240] },
+      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 28 }, 2: { cellWidth: 22 }, 3: { cellWidth: 30 } },
+    });
+
+    pdf.save(`${project?.name ?? "report"}-keywords.pdf`);
+    setShowExportMenu(false);
+  };
+
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-[#FDFCFA]">
@@ -221,6 +292,58 @@ export default function ProjectKeywordsPage() {
                   {runningAll ? "Running all..." : "Run All Checks"}
                 </button>
               )}
+              {/* Export Report — Agency only */}
+              <div className="relative" ref={exportMenuRef}>
+                {plan === "agency" ? (
+                  <>
+                    <button
+                      onClick={() => setShowExportMenu((v) => !v)}
+                      disabled={keywords.length === 0}
+                      className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:border-[#00e5ff] hover:text-[#00e5ff] transition-all duration-200 disabled:opacity-40"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Export Report
+                    </button>
+                    {showExportMenu && (
+                      <div className="absolute right-0 top-full mt-1 w-40 rounded-xl border border-black/[0.07] bg-white shadow-lg z-50 overflow-hidden">
+                        <button
+                          onClick={exportCSV}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-[#F5F5F0] transition-colors"
+                        >
+                          <svg className="h-4 w-4 text-[#00e5ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          Export CSV
+                        </button>
+                        <button
+                          onClick={exportPDF}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-[#F5F5F0] transition-colors border-t border-black/[0.05]"
+                        >
+                          <svg className="h-4 w-4 text-[#ff4d6d]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                          Export PDF
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div title="Upgrade to Agency to export reports">
+                    <button
+                      disabled
+                      className="flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-400 cursor-not-allowed"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Export Report
+                      <span className="text-[10px] rounded-full bg-[#7c3aed]/10 text-[#7c3aed] px-1.5 py-0.5 font-mono">Agency</span>
+                    </button>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => setShowAddForm((v) => !v)}
                 className="flex items-center gap-2 rounded-lg bg-[#39ff14] px-4 py-2 text-sm font-semibold text-black hover:bg-[#2ecc14] transition-all duration-200"
