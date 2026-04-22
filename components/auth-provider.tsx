@@ -65,6 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (e) {
         console.error("[auth] failed to load user doc:", e);
+        // Still apply email-based overrides even if Firestore is unreachable
+        if (nextUser) setPlan(getEffectivePlan("free", nextUser.email));
       } finally {
         setLoading(false);
       }
