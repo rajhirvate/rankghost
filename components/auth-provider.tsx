@@ -54,17 +54,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const db = getClientDb();
     const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
       setUser(nextUser);
-
-      if (nextUser) {
-        await ensureUserDoc(nextUser.uid);
-        const userDoc = await getDoc(doc(db, "users", nextUser.uid));
-        const basePlan = (userDoc.data()?.plan ?? "free") as UserPlan["plan"];
-        setPlan(getEffectivePlan(basePlan, nextUser.email));
-      } else {
-        setPlan("free");
+      try {
+        if (nextUser) {
+          await ensureUserDoc(nextUser.uid);
+          const userDoc = await getDoc(doc(db, "users", nextUser.uid));
+          const basePlan = (userDoc.data()?.plan ?? "free") as UserPlan["plan"];
+          setPlan(getEffectivePlan(basePlan, nextUser.email));
+        } else {
+          setPlan("free");
+        }
+      } catch (e) {
+        console.error("[auth] failed to load user doc:", e);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => unsubscribe();
