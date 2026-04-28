@@ -68,8 +68,20 @@ export function DashboardSidebar() {
     load().catch(console.error);
   }, [user]);
 
+  const navItems = nav.map((item) => {
+    const isActive = item.exact
+      ? pathname === item.href
+      : pathname.startsWith(item.href);
+    return {
+      ...item,
+      href: item.href === "/dashboard/projects" ? "/dashboard/projects/new" : item.href,
+      isActive,
+    };
+  });
+
   return (
-    <aside className="fixed left-0 top-0 h-screen w-60 flex flex-col bg-[#0d0d0d] border-r border-white/[0.06] z-40">
+    <>
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-60 flex-col bg-[#0d0d0d] border-r border-white/[0.06] md:flex">
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
         <Link href="/dashboard" className="flex items-center gap-2.5">
@@ -85,21 +97,18 @@ export function DashboardSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-2 space-y-0.5">
-        {nav.map((item) => {
-          const isActive = item.exact
-            ? pathname === item.href
-            : pathname.startsWith(item.href);
+        {navItems.map((item) => {
           return (
             <Link
               key={item.label}
-              href={item.href === "/dashboard/projects" ? "/dashboard/projects/new" : item.href}
+              href={item.href}
               className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
-                isActive
+                item.isActive
                   ? "bg-[#39ff14]/10 text-[#39ff14]"
                   : "text-white/40 hover:text-white/80 hover:bg-white/[0.04]"
               }`}
             >
-              {isActive && (
+              {item.isActive && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#39ff14] rounded-r-full" />
               )}
               {item.icon}
@@ -205,5 +214,20 @@ export function DashboardSidebar() {
         </div>
       </div>
     </aside>
+    <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-3 border-t border-white/[0.08] bg-[#0d0d0d]/95 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur md:hidden">
+      {navItems.map((item) => (
+        <Link
+          key={item.label}
+          href={item.href}
+          className={`flex h-14 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium transition-colors ${
+            item.isActive ? "bg-[#39ff14]/10 text-[#39ff14]" : "text-white/45"
+          }`}
+        >
+          {item.icon}
+          <span>{item.label}</span>
+        </Link>
+      ))}
+    </nav>
+    </>
   );
 }

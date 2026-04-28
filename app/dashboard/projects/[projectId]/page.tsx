@@ -269,24 +269,24 @@ export default function ProjectKeywordsPage() {
     <ProtectedRoute>
       <div className="flex min-h-screen bg-[#FDFCFA]">
         <DashboardSidebar />
-        <div className="flex-1 ml-60">
+        <div className="min-w-0 flex-1 pb-24 md:ml-60 md:pb-0">
           {/* Top bar */}
-          <header className="sticky top-0 z-30 flex items-center justify-between px-8 py-4 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07]">
-            <div>
+          <header className="sticky top-0 z-30 flex flex-col items-stretch justify-between gap-3 px-4 py-3 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07] sm:px-6 md:flex-row md:items-center md:px-8 md:py-4">
+            <div className="min-w-0">
               <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
                 <Link href="/dashboard" className="hover:text-[#39ff14] transition-colors">Dashboard</Link>
                 <span>›</span>
-                <span className="text-slate-800">{project?.name ?? "Project"}</span>
+                <span className="truncate text-slate-800">{project?.name ?? "Project"}</span>
               </div>
-              <h1 className="font-display text-xl font-normal text-slate-800">{project?.name ?? "Project"}</h1>
-              {project?.domain && <p className="text-xs text-slate-400 font-mono mt-0.5">{project.domain}</p>}
+              <h1 className="truncate font-display text-xl font-normal text-slate-800">{project?.name ?? "Project"}</h1>
+              {project?.domain && <p className="truncate text-xs text-slate-400 font-mono mt-0.5">{project.domain}</p>}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 md:gap-3">
               {keywords.length > 0 && (
                 <button
                   onClick={runAllChecks}
                   disabled={runningAll}
-                  className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:border-[#39ff14] hover:text-[#39ff14] transition-all duration-200 disabled:opacity-50"
+                  className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:border-[#39ff14] hover:text-[#39ff14] transition-all duration-200 disabled:opacity-50 sm:px-4"
                 >
                   {runningAll ? <Spinner /> : null}
                   {runningAll ? "Running all..." : "Run All Checks"}
@@ -299,7 +299,7 @@ export default function ProjectKeywordsPage() {
                     <button
                       onClick={() => setShowExportMenu((v) => !v)}
                       disabled={keywords.length === 0}
-                      className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:border-[#00e5ff] hover:text-[#00e5ff] transition-all duration-200 disabled:opacity-40"
+                      className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:border-[#00e5ff] hover:text-[#00e5ff] transition-all duration-200 disabled:opacity-40 sm:px-4"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -333,7 +333,7 @@ export default function ProjectKeywordsPage() {
                   <div title="Upgrade to Agency to export reports">
                     <button
                       disabled
-                      className="flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-400 cursor-not-allowed"
+                      className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-400 cursor-not-allowed sm:px-4"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -346,7 +346,7 @@ export default function ProjectKeywordsPage() {
               </div>
               <button
                 onClick={() => setShowAddForm((v) => !v)}
-                className="flex items-center gap-2 rounded-lg bg-[#39ff14] px-4 py-2 text-sm font-semibold text-black hover:bg-[#2ecc14] transition-all duration-200"
+                className="flex min-h-10 items-center gap-2 rounded-lg bg-[#39ff14] px-3 py-2 text-sm font-semibold text-black hover:bg-[#2ecc14] transition-all duration-200 sm:px-4"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -356,10 +356,10 @@ export default function ProjectKeywordsPage() {
             </div>
           </header>
 
-          <main className="px-8 py-8">
+          <main className="px-4 py-5 sm:px-6 md:px-8 md:py-8">
             {/* Add keyword form */}
             {showAddForm && (
-              <form onSubmit={addKeyword} className="mb-6 flex items-center gap-3 rounded-xl border border-black/[0.07] bg-white p-4">
+              <form onSubmit={addKeyword} className="mb-6 flex flex-col gap-3 rounded-xl border border-black/[0.07] bg-white p-4 sm:flex-row sm:items-center">
                 <input
                   value={newKeyword}
                   onChange={(e) => setNewKeyword(e.target.value)}
@@ -384,7 +384,7 @@ export default function ProjectKeywordsPage() {
 
             {/* Keywords table */}
             <div className="rounded-xl border border-black/[0.07] bg-white overflow-hidden">
-              <div className="px-6 py-4 border-b border-black/[0.07] flex items-center justify-between">
+              <div className="px-4 py-4 border-b border-black/[0.07] flex items-center justify-between sm:px-6">
                 <h2 className="font-display text-sm font-normal text-slate-800">Keywords</h2>
                 <span className="text-xs font-medium text-slate-500">{keywords.length} keyword{keywords.length !== 1 ? "s" : ""}</span>
               </div>
@@ -398,7 +398,8 @@ export default function ProjectKeywordsPage() {
                   <p className="text-slate-400 text-xs">Click &quot;Add Keyword&quot; to start tracking.</p>
                 </div>
               ) : (
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto">
+                <table className="min-w-[920px] w-full text-sm">
                   <thead>
                     <tr className="border-b border-black/[0.07]">
                       {["Keyword", "SERP Rank", "Change", "Trend", "AI Citation", "Last Checked", "Actions"].map((h) => (
@@ -464,6 +465,7 @@ export default function ProjectKeywordsPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </main>

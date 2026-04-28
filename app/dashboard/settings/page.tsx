@@ -49,9 +49,9 @@ export default function SettingsPage() {
     <ProtectedRoute>
       <div className="flex min-h-screen bg-[#FDFCFA]">
         <DashboardSidebar />
-        <div className="flex-1 ml-60">
+        <div className="min-w-0 flex-1 pb-24 md:ml-60 md:pb-0">
           {/* Top bar */}
-          <header className="sticky top-0 z-30 flex items-center justify-between px-8 py-4 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07]">
+          <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07] sm:px-6 md:px-8 md:py-4">
             <div>
               <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
                 <Link href="/dashboard" className="hover:text-[#39ff14] transition-colors">Dashboard</Link>
@@ -62,13 +62,13 @@ export default function SettingsPage() {
             </div>
           </header>
 
-          <main className="px-8 py-8 max-w-2xl">
+          <main className="max-w-2xl px-4 py-5 sm:px-6 md:px-8 md:py-8">
 
             {/* Profile */}
             <section className="mb-6">
               <h2 className="font-mono text-[10px] uppercase tracking-widest text-slate-400 mb-3">Profile</h2>
               <div className="rounded-xl border border-black/[0.07] bg-white overflow-hidden">
-                <div className="p-6 border-b border-black/[0.07] flex items-center gap-4">
+                <div className="p-4 border-b border-black/[0.07] flex items-center gap-4 sm:p-6">
                   <div className="h-14 w-14 rounded-full bg-[#39ff14]/10 border-2 border-[#39ff14]/20 flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-[#39ff14]">{initials}</span>
                   </div>
@@ -77,7 +77,7 @@ export default function SettingsPage() {
                     <p className="text-sm text-slate-400 capitalize">{plan} plan · Member</p>
                   </div>
                 </div>
-                <form onSubmit={handleSave} className="p-6 space-y-4">
+                <form onSubmit={handleSave} className="p-4 space-y-4 sm:p-6">
                   <div className="space-y-1.5">
                     <label className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Display Name</label>
                     <input

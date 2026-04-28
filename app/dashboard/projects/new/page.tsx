@@ -36,8 +36,8 @@ export default function CreateProjectPage() {
     <ProtectedRoute>
       <div className="flex min-h-screen bg-[#FDFCFA]">
         <DashboardSidebar />
-        <div className="flex-1 ml-60">
-          <header className="sticky top-0 z-30 flex items-center px-8 py-4 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07]">
+        <div className="min-w-0 flex-1 pb-24 md:ml-60 md:pb-0">
+          <header className="sticky top-0 z-30 flex items-center px-4 py-3 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07] sm:px-6 md:px-8 md:py-4">
             <div>
               <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
                 <Link href="/dashboard" className="hover:text-[#39ff14] transition-colors">Dashboard</Link>
@@ -48,9 +48,9 @@ export default function CreateProjectPage() {
             </div>
           </header>
 
-          <main className="px-8 py-8">
+          <main className="px-4 py-5 sm:px-6 md:px-8 md:py-8">
             <div className="max-w-lg">
-              <form onSubmit={handleSubmit} className="rounded-xl border border-black/[0.07] bg-white p-6 space-y-5">
+              <form onSubmit={handleSubmit} className="rounded-xl border border-black/[0.07] bg-white p-4 space-y-5 sm:p-6">
                 <div className="space-y-1.5">
                   <label className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Project Name</label>
                   <input
@@ -78,7 +78,7 @@ export default function CreateProjectPage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-3 pt-1">
+                <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center">
                   <button
                     type="submit"
                     disabled={busy}

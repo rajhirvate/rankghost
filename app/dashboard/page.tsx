@@ -28,19 +28,36 @@ export default function DashboardPage() {
   const [projectAvgRanks, setProjectAvgRanks] = useState<Record<string, number | null>>({});
   const [projectKeywordCounts, setProjectKeywordCounts] = useState<Record<string, number>>({});
   const [projectLastChecked, setProjectLastChecked] = useState<Record<string, string | null>>({});
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [usageOpen, setUsageOpen] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setProjects([]);
+      setProjectsLoading(false);
+      return;
+    }
     const db = getClientDb();
     const projectsRef = collection(db, "users", user.uid, "projects");
-    const unsubscribe = onSnapshot(projectsRef, (snapshot) => {
-      setProjects(
-        snapshot.docs
-          .map((d) => ({ id: d.id, ...(d.data() as ProjectDoc) }))
-          .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
-      );
-    });
+    setProjectsLoading(true);
+    setDashboardError(null);
+    const unsubscribe = onSnapshot(
+      projectsRef,
+      (snapshot) => {
+        setProjects(
+          snapshot.docs
+            .map((d) => ({ id: d.id, ...(d.data() as ProjectDoc) }))
+            .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+        );
+        setProjectsLoading(false);
+      },
+      (error) => {
+        console.error("[dashboard] failed to load projects:", error);
+        setDashboardError("Unable to load your projects. Please refresh or try again shortly.");
+        setProjectsLoading(false);
+      }
+    );
     return () => unsubscribe();
   }, [user]);
 
@@ -79,7 +96,10 @@ export default function DashboardPage() {
       setProjectKeywordCounts(kwCounts);
       setProjectLastChecked(lastChecked);
     };
-    loadMetrics().catch(console.error);
+    loadMetrics().catch((error) => {
+      console.error("[dashboard] failed to load metrics:", error);
+      setDashboardError("Projects loaded, but dashboard metrics could not be refreshed.");
+    });
   }, [projects, user]);
 
   const stats = [
@@ -93,13 +113,13 @@ export default function DashboardPage() {
     <ProtectedRoute>
       <div className="flex min-h-screen bg-[#FDFCFA]">
         <DashboardSidebar />
-        <div className="flex-1 ml-60">
+        <div className="min-w-0 flex-1 pb-24 md:ml-60 md:pb-0">
           {/* Top bar */}
-          <header className="sticky top-0 z-30 flex items-center justify-between px-8 py-4 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07]">
+          <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-[#FDFCFA]/80 backdrop-blur border-b border-black/[0.07] sm:px-6 md:px-8 md:py-4">
             <h1 className="font-display text-xl font-normal text-slate-800">Dashboard</h1>
             <Link
               href="/dashboard/projects/new"
-              className="flex items-center gap-2 rounded-lg bg-[#39ff14] px-4 py-2 text-sm font-semibold text-black hover:bg-[#2ecc14] transition-all duration-200"
+              className="flex min-h-10 items-center gap-2 rounded-lg bg-[#39ff14] px-3 py-2 text-sm font-semibold text-black hover:bg-[#2ecc14] transition-all duration-200 sm:px-4"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -108,7 +128,7 @@ export default function DashboardPage() {
             </Link>
           </header>
 
-          <main className="px-8 py-8">
+          <main className="px-4 py-5 sm:px-6 md:px-8 md:py-8">
             {/* Plan & Usage — top */}
             {(() => {
               const limit = PLAN_LIMITS[plan];
@@ -117,10 +137,10 @@ export default function DashboardPage() {
               const hasAiCitations = plan === "starter" || plan === "pro" || plan === "agency";
               const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
               return (
-                <div className="mb-6 rounded-xl border border-black/[0.07] bg-white overflow-hidden">
+                <div className="mb-5 rounded-xl border border-black/[0.07] bg-white overflow-hidden md:mb-6">
                   <button
                     onClick={() => setUsageOpen((v) => !v)}
-                    className="w-full px-6 py-4 flex items-center justify-between border-b border-black/[0.07] hover:bg-slate-50 transition-colors"
+                    className="w-full px-4 py-4 flex items-center justify-between border-b border-black/[0.07] hover:bg-slate-50 transition-colors sm:px-6"
                   >
                     <div className="flex items-center gap-3">
                       <h2 className="font-display text-sm font-normal text-slate-800">Plan &amp; Usage</h2>
@@ -136,8 +156,8 @@ export default function DashboardPage() {
                     </svg>
                   </button>
 
-                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${usageOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}>
-                  <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${usageOpen ? "max-h-[760px] opacity-100 sm:max-h-[500px]" : "max-h-0 opacity-0"}`}>
+                  <div className="p-4 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-4 lg:gap-6">
                     {/* Keywords */}
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center justify-between">
@@ -196,7 +216,7 @@ export default function DashboardPage() {
                   </div>
 
                   {plan === "free" && (
-                    <div className="mx-6 mb-6 rounded-lg bg-gradient-to-r from-[#39ff14]/10 to-transparent border border-[#39ff14]/20 px-4 py-3 flex items-center justify-between gap-4">
+                    <div className="mx-4 mb-4 rounded-lg bg-gradient-to-r from-[#39ff14]/10 to-transparent border border-[#39ff14]/20 px-4 py-3 flex flex-col items-stretch justify-between gap-3 sm:mx-6 sm:mb-6 sm:flex-row sm:items-center sm:gap-4">
                       <div>
                         <p className="text-sm font-semibold text-slate-800">Upgrade to Starter</p>
                         <p className="text-xs text-slate-500 mt-0.5">Get 100 keywords, daily checks, and AI citation monitoring.</p>
@@ -210,23 +230,34 @@ export default function DashboardPage() {
             })()}
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 gap-3 mb-5 min-[420px]:grid-cols-2 lg:grid-cols-4 lg:gap-4 md:mb-6">
               {stats.map((s) => (
-                <div key={s.label} className={`rounded-xl border-t-2 ${s.border} bg-white border border-black/[0.07] p-6 py-8 hover:border-[#2a3f5f] transition-all duration-200`}>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-black mb-4">{s.label}</p>
-                  <p className="font-display text-3xl font-normal text-black leading-none">{s.value}</p>
+                <div key={s.label} className={`rounded-xl border-t-2 ${s.border} bg-white border border-black/[0.07] p-4 hover:border-[#2a3f5f] transition-all duration-200 sm:p-5 md:p-6 md:py-8`}>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-black mb-3 md:mb-4">{s.label}</p>
+                  <p className="font-display text-2xl font-normal text-black leading-none md:text-3xl">{s.value}</p>
                 </div>
               ))}
             </div>
 
             {/* Projects table */}
             <div className="rounded-xl border border-black/[0.07] bg-white overflow-hidden">
-              <div className="px-6 py-4 border-b border-black/[0.07] flex items-center justify-between">
+              <div className="px-4 py-4 border-b border-black/[0.07] flex items-center justify-between sm:px-6">
                 <h2 className="font-display text-sm font-normal text-slate-800">Projects</h2>
                 <span className="text-xs text-slate-400">{projects.length} project{projects.length !== 1 ? "s" : ""}</span>
               </div>
 
-              {projects.length === 0 ? (
+              {dashboardError ? (
+                <div className="px-6 py-10">
+                  <div className="rounded-lg border border-[#ff4d6d]/30 bg-[#ff4d6d]/10 p-4 text-sm text-[#ff4d6d]">
+                    {dashboardError}
+                  </div>
+                </div>
+              ) : projectsLoading ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#39ff14]" />
+                  <p className="mt-4 text-sm text-slate-400">Loading projects...</p>
+                </div>
+              ) : projects.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <svg className="h-12 w-12 text-[#1e2d45] mb-4" viewBox="0 0 24 24" fill="none">
                     <path d="M12,4 C8.13401,4 5,7.13401 5,11 L5,19.6207 C5,19.9257 5.32764,20.1185 5.59426,19.9703 L6.53669,19.4468 C7.75977,18.7673 9.249,18.7762 10.4638,19.4704 L11.0077,19.7812 C11.6226,20.1326 12.3774,20.1326 12.9923,19.7812 L13.5362,19.4704 C14.751,18.7762 16.2402,18.7673 17.4633,19.4468 L18.4057,19.9703 C18.6724,20.1185 19,19.9257 19,19.6207 L19,11 C19,7.13401 15.866,4 12,4 Z M3,11 C3,6.02944 7.02944,2 12,2 C16.9706,2 21,6.02944 21,11 L21,19.6207 C21,21.4506 19.0341,22.6074 17.4345,21.7187 L16.492,21.1951 C15.8805,20.8553 15.1359,20.8598 14.5285,21.2069 L13.9846,21.5177 C12.7548,22.2204 11.2452,22.2204 10.0154,21.5177 L9.47154,21.2069 C8.86413,20.8598 8.11951,20.8553 7.50797,21.1951 L6.56554,21.7187 C4.96587,22.6074 3,21.4506 3,19.6207 L3,11 Z" fill="currentColor"/>
@@ -238,7 +269,43 @@ export default function DashboardPage() {
                   </Link>
                 </div>
               ) : (
-                <table className="w-full text-sm">
+                <>
+                <div className="divide-y divide-black/[0.07] md:hidden">
+                  {projects.map((item) => {
+                    const avg = projectAvgRanks[item.id] ?? null;
+                    return (
+                      <Link
+                        key={item.id}
+                        href={`/dashboard/projects/${item.id}`}
+                        className="block px-4 py-4 transition-colors active:bg-[#F5F5F0]"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2.5">
+                              <RankDot avg={avg} />
+                              <p className="truncate text-sm font-semibold text-slate-800">{item.name}</p>
+                            </div>
+                            <p className="mt-1 truncate font-mono text-xs text-slate-400">{item.domain}</p>
+                          </div>
+                          <span className="shrink-0 rounded-lg border border-black/[0.07] px-2.5 py-1 text-xs text-slate-500">
+                            {projectKeywordCounts[item.id] ?? 0} kw
+                          </span>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                          <div>
+                            <p className="text-slate-400">Avg Rank</p>
+                            <p className="mt-0.5 font-semibold text-slate-800">{avg !== null ? `#${avg}` : "—"}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400">Last Checked</p>
+                            <p className="mt-0.5 font-semibold text-slate-800">{projectLastChecked[item.id] ? new Date(projectLastChecked[item.id]!).toLocaleDateString() : "Never"}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <table className="hidden w-full text-sm md:table">
                   <thead>
                     <tr className="border-b border-black/[0.07]">
                       {["Project Name", "Domain", "Keywords", "Avg Rank", "Last Checked", "Action"].map((h) => (
@@ -274,6 +341,7 @@ export default function DashboardPage() {
                     })}
                   </tbody>
                 </table>
+                </>
               )}
             </div>
           </main>

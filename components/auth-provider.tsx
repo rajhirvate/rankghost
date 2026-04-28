@@ -19,6 +19,7 @@ import {
   useState,
 } from "react";
 import { getClientAuth, getClientDb } from "@/lib/firebase";
+import { normalizePlanTier } from "@/lib/plans";
 import { getEffectivePlan } from "@/lib/pro-overrides";
 import { UserPlan } from "@/lib/types";
 
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (nextUser) {
           await ensureUserDoc(nextUser.uid);
           const userDoc = await getDoc(doc(db, "users", nextUser.uid));
-          const basePlan = (userDoc.data()?.plan ?? "free") as UserPlan["plan"];
+          const basePlan = normalizePlanTier(userDoc.data()?.plan);
           setPlan(getEffectivePlan(basePlan, nextUser.email));
         } else {
           setPlan("free");
