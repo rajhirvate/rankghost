@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { env } from "@/lib/paypal";
 
 /** Public client id for PayPal JS SDK — safe to expose; read at runtime so deploys always pick up env. */
 export async function GET() {
   const clientId =
-    process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID?.trim() ||
-    process.env.PAYPAL_CLIENT_ID?.trim() ||
+    env("NEXT_PUBLIC_PAYPAL_CLIENT_ID") ||
+    env("PAYPAL_CLIENT_ID") ||
     "";
 
   if (!clientId) {

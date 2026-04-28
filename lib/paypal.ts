@@ -1,11 +1,15 @@
 export const PAYPAL_API =
-  process.env.PAYPAL_MODE === "sandbox"
+  process.env.PAYPAL_MODE?.trim() === "sandbox"
     ? "https://api-m.sandbox.paypal.com"
     : "https://api-m.paypal.com";
 
+export function env(name: string) {
+  return process.env[name]?.trim();
+}
+
 export async function getPayPalAccessToken(): Promise<string> {
-  const clientId = process.env.PAYPAL_CLIENT_ID!;
-  const secret = process.env.PAYPAL_CLIENT_SECRET!;
+  const clientId = env("PAYPAL_CLIENT_ID")!;
+  const secret = env("PAYPAL_CLIENT_SECRET")!;
   const auth = Buffer.from(`${clientId}:${secret}`).toString("base64");
 
   const res = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {

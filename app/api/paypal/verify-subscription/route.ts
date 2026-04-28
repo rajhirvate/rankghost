@@ -1,14 +1,14 @@
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
-import { getSubscription } from "@/lib/paypal";
+import { env, getSubscription } from "@/lib/paypal";
 import { PlanTier } from "@/lib/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
 
 function tierFromPlanId(planId: string): PlanTier {
-  const e = process.env;
-  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL) return "starter";
-  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY  || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL)  return "agency";
+  const id = planId.trim();
+  if (id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY") || id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL")) return "starter";
+  if (id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY")  || id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL"))  return "agency";
   return "pro";
 }
 

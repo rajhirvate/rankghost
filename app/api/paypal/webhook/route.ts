@@ -1,19 +1,19 @@
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
-import { getPayPalAccessToken, PAYPAL_API } from "@/lib/paypal";
+import { env, getPayPalAccessToken, PAYPAL_API } from "@/lib/paypal";
 import { PlanTier } from "@/lib/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
 
 function tierFromPlanId(planId: string): PlanTier {
-  const e = process.env;
-  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL) return "starter";
-  if (planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY  || planId === e.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL)  return "agency";
+  const id = planId.trim();
+  if (id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY") || id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL")) return "starter";
+  if (id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY")  || id === env("NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL"))  return "agency";
   return "pro"; // Pro plan IDs (including legacy NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY/ANNUAL)
 }
 
 async function verifySignature(req: NextRequest, body: string): Promise<boolean> {
-  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  const webhookId = env("PAYPAL_WEBHOOK_ID");
   if (!webhookId) return true;
 
   try {
@@ -24,7 +24,7 @@ async function verifySignature(req: NextRequest, body: string): Promise<boolean>
       body: JSON.stringify({
         auth_algo: req.headers.get("paypal-auth-algo"),
         cert_url: req.headers.get("paypal-cert-url"),
-        client_id: process.env.PAYPAL_CLIENT_ID,
+        client_id: env("PAYPAL_CLIENT_ID"),
         transmission_id: req.headers.get("paypal-transmission-id"),
         transmission_sig: req.headers.get("paypal-transmission-sig"),
         transmission_time: req.headers.get("paypal-transmission-time"),

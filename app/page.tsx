@@ -9,6 +9,10 @@ import { useState } from "react";
 
 /* ─── data ─────────────────────────────────────────────────── */
 
+function env(name: string) {
+  return process.env[name]?.trim() ?? "";
+}
+
 const everythingFeatures = [
   { title: "Exact SERP Position", desc: "1-based rank across 100 Google results with root-domain matching.", icon: "🎯" },
   { title: "AI Citation Status", desc: "See if ChatGPT & AI engines cite your domain for the keyword.", icon: "🤖" },
@@ -31,8 +35,8 @@ const plans = [
     label: "For Freelancers & Solos",
     name: "Starter",
     tier: "starter",
-    monthly: { price: "9",  cents: ".99", note: "Billed monthly · No commitment",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY ?? "" },
-    yearly:  { price: "7",  cents: ".99", note: "Billed annually · Save $24/yr",     planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL  ?? "" },
+    monthly: { price: "9",  cents: ".99", note: "Billed monthly · No commitment",    planId: env("NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_MONTHLY") },
+    yearly:  { price: "7",  cents: ".99", note: "Billed annually · Save $24/yr",     planId: env("NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER_ANNUAL") },
     features: ["100 keywords", "Daily SERP rank tracking (top 100)", "AI citation monitoring", "Rank history charts"],
     cta: "Get Started",
     featured: false,
@@ -41,8 +45,8 @@ const plans = [
     label: "For Growing Teams",
     name: "Pro",
     tier: "pro",
-    monthly: { price: "24", cents: ".99", note: "Billed monthly · No commitment",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO_MONTHLY ?? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY ?? "" },
-    yearly:  { price: "19", cents: ".99", note: "Billed annually · Save $60/yr",     planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO_ANNUAL  ?? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_ANNUAL  ?? "" },
+    monthly: { price: "24", cents: ".99", note: "Billed monthly · No commitment",    planId: env("NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO_MONTHLY") || env("NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY") },
+    yearly:  { price: "19", cents: ".99", note: "Billed annually · Save $60/yr",     planId: env("NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO_ANNUAL") || env("NEXT_PUBLIC_PAYPAL_PLAN_ID_ANNUAL") },
     features: ["500 keywords", "Daily SERP rank tracking (top 100)", "AI citation monitoring", "Bulk parallel checks", "Multi-project dashboard", "Priority support"],
     cta: "Get Started",
     featured: true,
@@ -51,8 +55,8 @@ const plans = [
     label: "For Agencies",
     name: "Agency",
     tier: "agency",
-    monthly: { price: "69", cents: ".99", note: "Billed monthly · No commitment",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY ?? "" },
-    yearly:  { price: "55", cents: ".99", note: "Billed annually · Save $168/yr",    planId: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL  ?? "" },
+    monthly: { price: "69", cents: ".99", note: "Billed monthly · No commitment",    planId: env("NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_MONTHLY") },
+    yearly:  { price: "55", cents: ".99", note: "Billed annually · Save $168/yr",    planId: env("NEXT_PUBLIC_PAYPAL_PLAN_ID_AGENCY_ANNUAL") },
     features: ["2,000 keywords", "Everything in Pro", "White-label reports", "Dedicated account manager"],
     cta: "Get Started",
     featured: false,
