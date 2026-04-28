@@ -8,6 +8,30 @@ type AuthFormProps = {
   mode: "login" | "signup";
 };
 
+function authErrorMessage(error: unknown, mode: AuthFormProps["mode"]) {
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+
+  if (code === "auth/invalid-credential" || code === "auth/user-not-found" || code === "auth/wrong-password") {
+    return "No matching account was found for that email and password.";
+  }
+  if (code === "auth/invalid-email") {
+    return "Enter a valid email address.";
+  }
+  if (code === "auth/email-already-in-use") {
+    return "An account already exists for this email. Sign in instead.";
+  }
+  if (code === "auth/operation-not-allowed") {
+    return "Email/password sign-in is not enabled for this Firebase project.";
+  }
+  if (code === "auth/too-many-requests") {
+    return "Too many attempts. Wait a moment and try again.";
+  }
+
+  return mode === "login"
+    ? "Sign-in failed. Please try again."
+    : "Account creation failed. Please try again.";
+}
+
 export function AuthForm({ mode }: AuthFormProps) {
   const { login, signup, loginWithGoogle } = useAuth();
   const router = useRouter();
@@ -28,7 +52,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       }
       router.push("/dashboard");
     } catch (submitError) {
-      setError("Authentication failed. Please check your details.");
+      setError(authErrorMessage(submitError, mode));
       console.error(submitError);
     } finally {
       setBusy(false);
